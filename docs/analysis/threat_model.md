@@ -1,4 +1,4 @@
-# Threat Model: Physical IDS Telemetry
+# Threat Model: Kinetic IDS Node Telemetry
 
 This document outlines the security considerations and mitigations for the kinetic ids node.
 
