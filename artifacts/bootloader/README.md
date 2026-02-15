@@ -18,9 +18,9 @@ To bypass the "cannot read IDR" error, you must use the **dedicated SWD pins** l
 | **GP3** | **Pin 16 (SWDIO)** | Serial Wire Data |
 | **GP4** | **Pin 18 (RESET)** | Hardware Reset |
 
-![alt text](SCR-20260214-svgc.png)
+![alt text](./img/SCR-20260214-svgc.png)
 
-![alt text](rp2040-zero-raspberry-pi-pico-com-usb-c.jpeg)
+![alt text](./img/rp2040-zero-raspberry-pi-pico-com-usb-c.jpeg)
 
 ---
 
@@ -39,7 +39,7 @@ openocd -f interface/cmsis-dap.cfg -f target/nrf52.cfg -c "adapter speed 1000; i
 ```
 
 Success Check: You should see SWD DPIDR 0x2ba01477 and Mass erase completed.
-![alt text](SCR-20260214-tqmr.png)
+![alt text](./img/SCR-20260214-tqmr.png)
 
 ### 3. Flash the New Bootloader
 With the chip erased, flash the new bootloader hex. This command automatically verifies the data integrity.
@@ -49,11 +49,11 @@ With the chip erased, flash the new bootloader hex. This command automatically v
  ```
 
 Success Check: Look for ** Verified OK ** at the end of the output.
-![alt text](SCR-20260214-tuck.png)
+![alt text](./img/SCR-20260214-tuck.png)
 
 once the new firmware is installed, unplug the RP2040, and plug in the usb port of the NRF52480 and you should be greeted with the new volume loaded!
 
-![alt text](SCR-20260214-tusc.png)
+![alt text](./img/SCR-20260214-tusc.png)
 
 pinouts from: 
 
