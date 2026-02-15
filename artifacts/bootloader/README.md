@@ -55,3 +55,8 @@ once the new firmware is installed, unplug the RP2040, and plug in the usb port 
 
 ![alt text](SCR-20260214-tusc.png)
 
+pinouts from: 
+
+https://wiki.makerdiary.com/nrf52840-mdk-usb-dongle/hardware/
+
+https://www.waveshare.com/wiki/RP2040-Zero?srsltid=AfmBOooy5xTg69wj_1fWa-nLf3bzDKfl2c1daC3Vd5oTZTt03VSa2Wgo
