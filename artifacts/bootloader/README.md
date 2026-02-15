@@ -51,7 +51,7 @@ With the chip erased, flash the new bootloader hex. This command automatically v
 Success Check: Look for ** Verified OK ** at the end of the output.
 ![alt text](./img/SCR-20260214-tuck.png)
 
-once the new firmware is installed, unplug the RP2040, and plug in the usb port of the NRF52480 and you should be greeted with the new volume loaded!
+once the new firmware is installed, unplug the RP2040, and plug in the usb port of the NRF52840 and you should be greeted with the new volume loaded!
 
 ![alt text](./img/SCR-20260214-tusc.png)
 
