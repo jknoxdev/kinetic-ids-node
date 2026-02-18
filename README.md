@@ -1,6 +1,6 @@
 # lima-node
-L.I.M.A. > (Local Integrity Multi-modal Alert)
-The lima-node is a low-power intrusion detection system. Utilizing a Zephyr RTOS micro-kernel on the nRF52840, the system implements hardware-accelerated motion discrimination via an MPU6050 IMU. This node sends telemetry through an encrypted BLE-to-MQTT gateway, providing a resilient audit trail for physical access events.
+L.I.M.A. > (Local Integrity Multi-modal Architecture)
+The lima-node is a low-power kinetic / physical intrusion detection system. Utilizing a Zephyr RTOS micro-kernel on the nRF52840, the system implements hardware-accelerated motion discrimination via an MPU6050 IMU. This node sends telemetry through an encrypted BLE-to-MQTT gateway, providing a resilient audit trail for physical access events.
 
 ### Hardware Specification
 * **Edge Node:** Nordic Semiconductor nRF52840-DK (Cortex-M4F)
