@@ -30,7 +30,7 @@ skinparam {
     NoteFontColor #CCCCCC
 }
 
-title <size:18><color:#7EC8E3><b>L.I.M.A. — System Context</b></color></size>\n<size:12><color:#888888>Local Integrity Multi-modal Architecture v1.0</color></size>
+title <size:18><color:#7EC8E3><b>L.I.M.A. — System Context</b></size>\n<size:12><color:#888888>Local Integrity Multi-modal Architecture v1.0</size>
 
 actor "Security\nOperator" as operator #0f3460
 
@@ -43,23 +43,23 @@ rectangle "<b>Push Notification</b>\n--\nPushover / Pushbullet\n<i>Real-time ale
 rectangle "<b>SIEM / Log Aggregator</b>\n--\nSplunk / ELK / Graylog\n<i>Security event correlation" as siem #1a3a2a
 database "<b>Cloud Audit Store</b>\n--\nS3 / Azure Blob\n<i>Immutable audit trail" as cloud #2C0E3F
 
-node --> gateway : <color:#7EC8E3>Integrity Events\nBLE 5.0 / Coded PHY\n[Encrypted + Signed]</color>
-gateway --> push : <color:#7EC8E3>Alert\n[HTTPS / API]</color>
-gateway --> siem : <color:#7EC8E3>Event Stream\n[Syslog / MQTT]</color>
-gateway --> cloud : <color:#7EC8E3>Audit Records\n[HTTPS / TLS]</color>
-push --> operator : <color:#AAAAAA>Push Notification\n[Mobile App]</color>
-siem --> operator : <color:#AAAAAA>Dashboard / Alert\n[Web UI]</color>
+node --> gateway : <color:#7EC8E3>Integrity Events\nBLE 5.0 / Coded PHY\n[Encrypted + Signed]
+gateway --> push : <color:#7EC8E3>Alert\n[HTTPS / API]
+gateway --> siem : <color:#7EC8E3>Event Stream\n[Syslog / MQTT]
+gateway --> cloud : <color:#7EC8E3>Audit Records\n[HTTPS / TLS]
+push --> operator : <color:#AAAAAA>Push Notification\n[Mobile App]
+siem --> operator : <color:#AAAAAA>Dashboard / Alert\n[Web UI]
 
 note bottom of node
   <color:#27AE60>Hardware: nRF52840 + MPU6050 + Barometric
   Connectivity: BLE 5.0 Coded PHY (extended range)
-  Security: CryptoCell-310 hardware crypto</color>
+  Security: CryptoCell-310 hardware crypto
 end note
 
 note bottom of gateway
   <color:#27AE60>Hardware: Raspberry Pi Zero / nRF7002
   Software: Mosquitto MQTT + Python/Node.js
-  Storage: Local SQLite audit log</color>
+  Storage: Local SQLite audit log
 end note
 
 @enduml

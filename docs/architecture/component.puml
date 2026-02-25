@@ -30,7 +30,7 @@ skinparam {
     NoteFontSize 10
 }
 
-title <size:18><color:#7EC8E3><b>L.I.M.A. — Component Diagram</b></color></size>\n<size:12><color:#888888>Node + Gateway Internals</color></size>
+title <size:18><color:#7EC8E3><b>L.I.M.A. — Component Diagram</b></size>\n<size:12><color:#888888>Node + Gateway Internals</size>
 
 package "LIMA Node\n[nRF52840 / Zephyr RTOS]" as node_pkg {
 
@@ -50,12 +50,12 @@ package "LIMA Node\n[nRF52840 / Zephyr RTOS]" as node_pkg {
         [BLE 5.0 Stack\nCoded PHY] as ble #0f3460
     }
 
-    imu --> motion : <color:#AAAAAA>raw accel/gyro\n[I2C]</color>
-    baro --> pressure : <color:#AAAAAA>pressure delta\n[I2C]</color>
-    motion --> aggregator : <color:#AAAAAA>motion event</color>
-    pressure --> aggregator : <color:#AAAAAA>pressure event</color>
-    aggregator --> crypto : <color:#AAAAAA>integrity event</color>
-    crypto --> ble : <color:#7EC8E3>signed payload</color>
+    imu --> motion : <color:#AAAAAA>raw accel/gyro\n[I2C]
+    baro --> pressure : <color:#AAAAAA>pressure delta\n[I2C]
+    motion --> aggregator : <color:#AAAAAA>motion event
+    pressure --> aggregator : <color:#AAAAAA>pressure event
+    aggregator --> crypto : <color:#AAAAAA>integrity event
+    crypto --> ble : <color:#7EC8E3>signed payload
 }
 
 package "LIMA Gateway\n[Raspberry Pi Zero]" as gateway_pkg {
@@ -85,37 +85,37 @@ package "LIMA Gateway\n[Raspberry Pi Zero]" as gateway_pkg {
         [Cloud\nUploader] as cloud_h #0f3460
     }
 
-    scanner --> publisher : <color:#AAAAAA>BLE advertisement\nraw payload</color>
-    publisher --> mosquitto : <color:#AAAAAA>MQTT publish\nlima/events</color>
-    mosquitto --> router : <color:#AAAAAA>subscribe\nlima/#</color>
-    router --> verifier : <color:#AAAAAA>verify signature</color>
-    verifier --> sqlite : <color:#9B59B6>write event\n[always]</color>
-    verifier --> queue : <color:#AAAAAA>queue for egress</color>
-    queue --> push_h : <color:#7EC8E3>flush when online</color>
-    queue --> siem_h : <color:#7EC8E3>flush when online</color>
-    queue --> cloud_h : <color:#7EC8E3>flush when online</color>
+    scanner --> publisher : <color:#AAAAAA>BLE advertisement\nraw payload
+    publisher --> mosquitto : <color:#AAAAAA>MQTT publish\nlima/events
+    mosquitto --> router : <color:#AAAAAA>subscribe\nlima/#
+    router --> verifier : <color:#AAAAAA>verify signature
+    verifier --> sqlite : <color:#9B59B6>write event\n[always]
+    verifier --> queue : <color:#AAAAAA>queue for egress
+    queue --> push_h : <color:#7EC8E3>flush when online
+    queue --> siem_h : <color:#7EC8E3>flush when online
+    queue --> cloud_h : <color:#7EC8E3>flush when online
 }
 
-ble --> scanner : <color:#FF6B35>BLE 5.0 Coded PHY\n[Encrypted + Signed]</color>
+ble --> scanner : <color:#FF6B35>BLE 5.0 Coded PHY\n[Encrypted + Signed]
 
 note right of crypto
   <color:#27AE60>CryptoCell-310
   hardware accelerated
   ECDSA-P256 signing
-  per-event nonce</color>
+  per-event nonce
 end note
 
 note right of sqlite
   <color:#27AE60>Always written first
   Queue-and-flush pattern
   Survives internet outage
-  Local audit trail intact</color>
+  Local audit trail intact
 end note
 
 note bottom of verifier
   <color:#27AE60>Rejects unsigned
   or tampered events
-  before any egress</color>
+  before any egress
 end note
 
 @enduml
