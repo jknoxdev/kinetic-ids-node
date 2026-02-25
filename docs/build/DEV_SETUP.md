@@ -183,10 +183,16 @@ Install extensions:
 <summary>🐧 Linux / 🍎 macOS</summary>
 
 ```bash
-# for codium
+# codium on macos
 codium --install-extension nordic-semiconductor.nrf-connect
 codium --install-extension ms-vscode.cmake-tools
 codium --install-extension ms-vscode.cpptools
+
+# codium on linux
+codium --install-extension nordic-semiconductor.nrf-connect
+codium --install-extension ms-vscode.cmake-tools
+codium --install-extension llvm-vs-code-extensions.vscode-clangd
+codium --install-extension twxs.cmake
 
 # for m$ version
 code --install-extension nordic-semiconductor.nrf-connect
