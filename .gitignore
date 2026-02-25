@@ -1,2 +1,39 @@
-build/
-.venv/
+# ─── Build Artifacts ─────────────────────────────────────────────────────────
+*.elf
+*.bin
+*.map
+*.lst
+# Exception: keep the UF2 bootloader hex in artifacts — known binary for flashing
+*.hex
+!artifacts/nrf52480/uf2_bootloader-*.hex
+
+# ─── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+
+# ─── IDEs ────────────────────────────────────────────────────────────────────
+.vscode/settings.json
+.vscode/launch.json
+.vscode/c_cpp_properties.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+
+# ─── macOS ───────────────────────────────────────────────────────────────────
+.DS_Store
+
+# ─── Windows ─────────────────────────────────────────────────────────────────
+Thumbs.db
+Desktop.ini
+
+# ─── Secrets ─────────────────────────────────────────────────────────────────
+*.pem
+*.key
+*.p12
+secrets.yml
+.env
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
+*.log
