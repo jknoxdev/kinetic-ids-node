@@ -93,7 +93,7 @@ Each fires independently. An attacker must defeat both sensors simultaneously to
 
 ## Getting Started
 
-See [`docs/FLASHING.md`](docs/build/lima-node-flash-howto.docx) for the complete build and flash guide.
+See [`docs/FLASHING.md`](docs/build/FLASHING.md) for the complete build and flash guide.
 
 ```bash
 # 1. Initialize workspace
