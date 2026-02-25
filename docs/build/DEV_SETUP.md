@@ -115,7 +115,7 @@ This pulls Zephyr, Nordic NCS, MCUboot, and all HAL modules. Takes 5-15 minutes 
 ```bash
 # All platforms — venv must be active
 pip install -r zephyr/scripts/requirements.txt
-pip install -r nrf/scripts/requirements.txt
+pip install -r sdk-nrf/scripts/requirements.txt
 pip install -r bootloader/mcuboot/scripts/requirements.txt
 ```
 
