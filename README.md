@@ -1,93 +1,179 @@
-# lima-node
-L.I.M.A. > (Local Integrity Multi-modal Architecture)
-The lima-node is a low-power kinetic / physical intrusion detection system. Utilizing a Zephyr RTOS micro-kernel on the nRF52840, the system implements hardware-accelerated motion discrimination via an MPU6050 IMU. This node sends telemetry through an encrypted BLE-to-MQTT gateway, providing a resilient audit trail for physical access events.
+# L.I.M.A. — Local Integrity Multi-modal Architecture
 
-### Hardware Specification
-* **Edge Node:** Nordic Semiconductor nRF52840-DK (Cortex-M4F)
-* **Gateway:** Raspberry Pi Zero (Nano) running a hardened Linux stack
-* **Connectivity:** Bluetooth Low Energy (BLE) 5.0 with Coded PHY support for extended range
+> **A resilient, low-power Physical Intrusion Detection System (PIDS)**  
+> Cryptographically signed integrity events from the edge to the operator.
 
-## System Overview
-1. The LIMA Node (The "Edge")
-* Hardware: nRF52840 + MPU6050 + Barometric Sensor.
-* Software: Zephyr RTOS + CryptoCell-310.
+[![Build Status](https://img.shields.io/github/actions/workflow/status/jknoxdev/lima-node/render-diagrams.yml?label=diagrams&style=flat-square&color=2E75B6)](https://github.com/jknoxdev/lima-node/actions)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-nRF52840-orange?style=flat-square)](https://www.nordicsemi.com/Products/nRF52840)
+[![RTOS](https://img.shields.io/badge/RTOS-Zephyr%20%2F%20NCS-7EC8E3?style=flat-square)](https://developer.nordicsemi.com)
 
-◇ Function: Detects "Integrity Events" (Door open, Case tamper) and signs the alert.
+---
 
-2. The LIMA Gateway (The "Bridge")
-* Hardware: Raspberry Pi or an nRF7002 (Wi-Fi) development kit.
-* Software: MQTT Broker + Python/Node.js Logic.
+## What is LIMA?
 
-◇ Function: Translates the local BLE/Thread signal into a phone notification (via Pushbullet or Pushover).
+LIMA nodes are small, battery-powered sensors that detect physical integrity events — door opens, enclosure breaches, vehicle towing, cabinet punctures — and deliver cryptographically signed alerts to a local gateway, which routes them to operators via push notification, SIEM, or cloud audit trail.
 
-## Bringing Up the L.I.M.A. Node
-This project uses a Local Manifest topology. Follow these steps to initialize the workspace and install the necessary dependencies for the nRF52840.
+The system is designed to be **air-gapped first**. No cloud dependency for core operation. No persistent BLE connections. No trusted local network required. Just a node, a gateway, and a signed audit trail that survives internet outages.
 
-1. Prerequisite: Python Environment
-We recommend using a virtual environment to avoid dependency drift.
+**Two independent threat models, one pipeline:**
 
+| Trigger | Use Case | Sensor |
+|---|---|---|
+| `PRESSURE_BREACH` | Cabinet puncture, enclosure door open, seal broken | BMP280 barometric |
+| `MOTION_DETECTED` | Vehicle tow, rack movement, vibration attack | MPU6050 IMU |
+| `DUAL_BREACH` | Full physical intrusion — moved AND breached | Both |
 
-### Create and activate a clean environment
+Each fires independently. An attacker must defeat both sensors simultaneously to avoid detection.
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
+---
+
+## Hardware
+
+| Component | Part | Role |
+|---|---|---|
+| Edge Node | Nordic nRF52840 MDK USB Dongle | Sensor + crypto + BLE |
+| IMU | MPU6050 | Motion / vibration detection |
+| Barometric | BMP280 | Pressure delta detection |
+| Crypto | CryptoCell-310 (on-die) | ECDSA-P256 hardware signing |
+| Gateway | Raspberry Pi Zero | BLE scanner + MQTT broker |
+
+---
+
+## Architecture
+
+### System Context
+![System Context](docs/architecture/context.png)
+
+### Component Diagram
+![Component Diagram](docs/architecture/component.png)
+
+### Integrity Event Sequence
+![Sequence Diagram](docs/architecture/sequence.png)
+
+### Node Firmware State Machine
+![State Machine](docs/architecture/state.png)
+
+> All diagrams are maintained as PlantUML source in [`docs/architecture/`](docs/architecture/) and auto-rendered to SVG + PNG on every push via GitHub Actions.
+
+---
+
+## Security Design
+
+- **Every event is signed** — ECDSA-P256 via CryptoCell-310 hardware accelerator (~50ms, minimal power)
+- **Per-event nonce** — prevents replay attacks
+- **Tamper events are first-class** — a failed signature verification is itself logged and alerted
+- **SQLite written first** — audit trail is intact regardless of internet connectivity
+- **Queue-and-flush** — events survive gateway internet outages, delivered on reconnect
+- **Air-gapped core** — no cloud dependency for detection, signing, or local audit
+
+---
+
+## Firmware Stack
+
+```
+┌─────────────────────────────────┐
+│         Application Layer        │
+│  Event Aggregator · State Machine│
+├─────────────────────────────────┤
+│         Zephyr RTOS              │
+│  Scheduler · Power Mgmt · DTS   │
+├─────────────────────────────────┤
+│         Nordic NCS               │
+│  BLE Stack · CryptoCell · HAL   │
+├─────────────────────────────────┤
+│         nRF52840 Hardware        │
+│  Cortex-M4F · CryptoCell-310    │
+└─────────────────────────────────┘
 ```
 
-### Install West (Zephyr's meta-tool)
+**NCS Version:** v3.2.0-rc1 · **Zephyr:** 4.3.99 · **Board:** `nrf52840_mdk_usb_dongle/nrf52840`
+
+---
+
+## Getting Started
+
+See [`docs/FLASHING.md`](docs/FLASHING.md) for the complete build and flash guide.
 
 ```bash
+# 1. Initialize workspace
+python3 -m venv .venv && source .venv/bin/activate
 pip install west
-```
-
-2. Initialize the Workspace
-The west.yml in this repository acts as the master blueprint for the entire SDK.
-Bash
-
-### Initialize the workspace using this repo as the local manifest
-
-```bash
 west init -l lima-node
-```
-
-### Pull the Nordic Connect SDK (NCS), Zephyr, and HAL modules
-
-```bash
 west update
-```
 
-3. Install SDK Requirements
-Once the modules are downloaded, install the specific toolchain requirements:
-
-```bash
+# 2. Install SDK requirements
 pip install -r zephyr/scripts/requirements.txt
 pip install -r nrf/scripts/requirements.txt
-pip install -r bootloader/mcuboot/scripts/requirements.txt
+
+# 3. Build
+west build -b nrf52840_mdk_usb_dongle/nrf52840 lima-node/firmware \
+  -- -DCONFIG_BUILD_OUTPUT_UF2=y
+
+# 4. Flash (dongle in bootloader mode)
+west flash
 ```
 
+---
 
-4. Build & Verify
+## Repository Structure
 
-Test the toolchain by building the firmware for the nRF52840 MDK Dongle:
-
-
-```bash
-west build -b nrf52840_mdk lima-node/firmware
 ```
-
-
-
------
-
-folder layout:
-```
-├── src/
-│   ├── firmware/       # nRF52840 C++/Arduino code
-│   └── gateway/        # Python bridge for RPi
-├── docs/               # The "Senior Engineer" stuff
-│   ├── architecture/   # Diagrams and Schematics
-│   └── analysis/       # Power and Threat models
-├── tests/              # Validation scripts
-├── LICENSE
+lima-node/
+├── firmware/               # nRF52840 Zephyr firmware
+├── docs/
+│   ├── FLASHING.md         # Build + flash guide
+│   └── architecture/
+│       ├── context.puml    # System context diagram
+│       ├── component.puml  # Component diagram
+│       ├── sequence.puml   # Event sequence diagram
+│       ├── state.puml      # Firmware state machine
+│       └── adr/
+│           ├── ADR-001-nrf52840-selection.md
+│           ├── ADR-002-ble-vs-alternatives.md
+│           ├── ADR-003-mqtt-vs-alternatives.md
+│           └── ADR-004-zephyr-vs-alternatives.md
+├── artifacts/              # Scope captures, logic analyzer exports
+├── west.yml                # NCS workspace manifest
 └── README.md
 ```
+
+---
+
+## Architecture Decision Records
+
+Major technical decisions are documented in [`docs/architecture/adr/`](docs/architecture/adr/):
+
+| ADR | Decision | Status |
+|---|---|---|
+| [ADR-001](docs/architecture/adr/ADR-001-nrf52840-selection.md) | nRF52840 over ESP32 / STM32 | Accepted |
+| [ADR-002](docs/architecture/adr/ADR-002-ble-vs-alternatives.md) | BLE 5.0 over Thread / Zigbee / LoRa | Accepted |
+| [ADR-003](docs/architecture/adr/ADR-003-mqtt-vs-alternatives.md) | MQTT over CoAP / raw TCP / HTTP | Accepted |
+| [ADR-004](docs/architecture/adr/ADR-004-zephyr-vs-alternatives.md) | Zephyr RTOS over bare metal / FreeRTOS | Accepted |
+
+---
+
+## Roadmap
+
+- [ ] Firmware: IMU + barometric sensor drivers (Zephyr I2C)
+- [ ] Firmware: Event aggregator with independent OR trigger logic
+- [ ] Firmware: CryptoCell-310 ECDSA-P256 signing
+- [ ] Firmware: BLE advertisement with signed payload
+- [ ] Gateway: BlueZ BLE scanner + paho MQTT publisher
+- [ ] Gateway: Mosquitto broker + event router
+- [ ] Gateway: SQLite audit log + queue-and-flush egress
+- [ ] Gateway: Pushover / Pushbullet notification handler
+- [ ] Hardware: KiCad schematic for production PCB
+- [ ] Hardware: Power budget analysis + battery life model
+- [ ] Docs: Threat model diagram
+- [ ] Docs: Deployment guide
+
+---
+
+## License
+
+Apache 2.0 — see [LICENSE](LICENSE)
+
+---
+
+*LIMA — because the null documentation era is over.*
