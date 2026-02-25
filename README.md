@@ -171,6 +171,11 @@ Major technical decisions are documented in [`docs/architecture/adr/`](docs/arch
 
 ---
 
+## Security
+Found a vulnerability? Please review our [Security Policy](SECURITY.md) before opening an issue.
+
+---
+
 ## License
 
 Apache 2.0 — see [LICENSE](LICENSE)
