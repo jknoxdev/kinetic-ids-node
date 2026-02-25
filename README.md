@@ -93,7 +93,7 @@ Each fires independently. An attacker must defeat both sensors simultaneously to
 
 ## Getting Started
 
-See [`docs/FLASHING.md`](docs/FLASHING.md) for the complete build and flash guide.
+See [`docs/FLASHING.md`](docs/build/lima-node-flash-howto.docx) for the complete build and flash guide.
 
 ```bash
 # 1. Initialize workspace
@@ -146,10 +146,10 @@ Major technical decisions are documented in [`docs/architecture/adr/`](docs/arch
 
 | ADR | Decision | Status |
 |---|---|---|
-| [ADR-001](docs/architecture/adr/ADR-001-nrf52840-selection.md) | nRF52840 over ESP32 / STM32 | Accepted |
-| [ADR-002](docs/architecture/adr/ADR-002-ble-vs-alternatives.md) | BLE 5.0 over Thread / Zigbee / LoRa | Accepted |
-| [ADR-003](docs/architecture/adr/ADR-003-mqtt-vs-alternatives.md) | MQTT over CoAP / raw TCP / HTTP | Accepted |
-| [ADR-004](docs/architecture/adr/ADR-004-zephyr-vs-alternatives.md) | Zephyr RTOS over bare metal / FreeRTOS | Accepted |
+| [ADR-001](docs/architecture/adr/ADR-001-nrf52840-selection.md) | nRF52840 over ESP32 / STM32 | Active |
+| [ADR-002](docs/architecture/adr/ADR-002-ble-vs-alternatives.md) | BLE 5.0 over Thread / Zigbee / LoRa | Active |
+| [ADR-003](docs/architecture/adr/ADR-003-mqtt-vs-alternatives.md) | MQTT over CoAP / raw TCP / HTTP | Active |
+| [ADR-004](docs/architecture/adr/ADR-004-zephyr-vs-alternatives.md) | Zephyr RTOS over bare metal / FreeRTOS | Active |
 
 ---
 
