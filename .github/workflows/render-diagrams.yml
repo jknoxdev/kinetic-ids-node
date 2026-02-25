@@ -4,13 +4,13 @@ on:
   push:
     paths:
       - '**.puml'
-  workflow_dispatch:  # allows manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   render:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # needed to commit rendered files back
+      contents: write
 
     steps:
       - name: Checkout repo
@@ -18,15 +18,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Render PlantUML to SVG and PNG
-        uses: cloudbees/plantuml-github-action@master
-        with:
-          args: -v -tsvg **/*.puml
+      - name: Install PlantUML
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y plantuml
 
-      - name: Render PlantUML to PNG
-        uses: cloudbees/plantuml-github-action@master
-        with:
-          args: -v -tpng **/*.puml
+      - name: Render SVG and PNG
+        run: |
+          find . -name "*.puml" | while read f; do
+            echo "Rendering $f"
+            plantuml -tsvg "$f"
+            plantuml -tpng "$f"
+          done
 
       - name: Commit rendered diagrams
         uses: stefanzweifel/git-auto-commit-action@v5
