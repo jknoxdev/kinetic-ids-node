@@ -1,0 +1,170 @@
+@startuml state
+!pragma layout smetana
+
+skinparam {
+    BackgroundColor #1a1a2e
+    ArrowColor #7EC8E3
+    ArrowFontColor #CCCCCC
+    ArrowFontSize 10
+    DefaultFontName Arial
+    DefaultFontColor #E0E0E0
+    DefaultFontSize 11
+    StateBorderColor #4A90D9
+    StateBorderThickness 2
+    StateBackgroundColor #0f3460
+    StateFontColor #FFFFFF
+    StateFontSize 12
+    StateAttributeFontColor #AAAAAA
+    StateAttributeFontSize 10
+    NoteBackgroundColor #0D2818
+    NoteBorderColor #27AE60
+    NoteFontColor #AAAAAA
+    NoteFontSize 10
+}
+
+title <size:18><color:#7EC8E3><b>L.I.M.A. Node — Firmware State Machine</b></color></size>\n<size:12><color:#888888>nRF52840 / Zephyr RTOS</color></size>
+
+[*] --> BOOT
+
+state BOOT #0f3460 : **BOOT**
+BOOT : entry / init Zephyr kernel
+BOOT : entry / start watchdog
+BOOT : entry / init CryptoCell-310
+BOOT : entry / load config from flash
+
+state CALIBRATING #1a3060 : **CALIBRATING**
+CALIBRATING : entry / warm up BMP280
+CALIBRATING : entry / warm up MPU6050
+CALIBRATING : entry / establish BLE baseline
+CALIBRATING : do / collect baseline pressure
+CALIBRATING : do / collect baseline accel
+CALIBRATING : exit / store baseline to SRAM
+
+state ARMED #0D3320 : **ARMED**
+ARMED : entry / enable sensor interrupts
+ARMED : do / monitor BMP280 delta
+ARMED : do / monitor MPU6050 threshold
+ARMED : do / poll BLE heartbeat
+
+state LIGHT_SLEEP #0f3460 : **LIGHT SLEEP**
+LIGHT_SLEEP : entry / disable non-critical peripherals
+LIGHT_SLEEP : do / maintain sensor IRQ wakeup
+LIGHT_SLEEP : do / increment sleep timer
+
+state DEEP_SLEEP #0a1a3a : **DEEP SLEEP**
+DEEP_SLEEP : entry / disable BLE
+DEEP_SLEEP : entry / suspend all peripherals
+DEEP_SLEEP : do / RTC wakeup only
+DEEP_SLEEP : exit / reinit BLE on wake
+
+state EVENT_DETECTED #2a1a0a : **EVENT DETECTED**
+EVENT_DETECTED : entry / latch trigger type
+EVENT_DETECTED : entry / record timestamp
+EVENT_DETECTED : do / log: PRESSURE_BREACH\n/ MOTION_DETECTED / DUAL_BREACH
+
+state SIGNING #2a1a4a : **SIGNING**
+SIGNING : entry / compose event payload
+SIGNING : do / generate nonce
+SIGNING : do / ECDSA-P256 sign [CryptoCell-310]
+SIGNING : do / encrypt payload
+SIGNING : exit / signed packet ready
+
+state TRANSMITTING #0f3460 : **TRANSMITTING**
+TRANSMITTING : entry / wake BLE stack
+TRANSMITTING : do / advertise signed payload
+TRANSMITTING : do / await BLE TX confirm
+TRANSMITTING : exit / log TX attempt
+
+state COOLDOWN #1a2a1a : **COOLDOWN**
+COOLDOWN : entry / start cooldown timer
+COOLDOWN : do / suppress new events
+COOLDOWN : do / configurable duration
+COOLDOWN : exit / clear event latch
+
+state FAULT #3a0a0a : **FAULT**
+FAULT : entry / log fault type to flash
+FAULT : entry / assert fault LED
+FAULT : do / attempt recovery
+FAULT : do / broadcast fault over BLE
+
+state LOW_BATTERY #2a1a00 : **LOW BATTERY**
+LOW_BATTERY : entry / log low battery event
+LOW_BATTERY : entry / notify gateway via BLE
+LOW_BATTERY : do / reduce poll frequency
+LOW_BATTERY : do / disable deep sleep cycling
+
+' ── Normal flow ──────────────────────────────
+BOOT --> CALIBRATING : init complete\n[watchdog armed]
+
+CALIBRATING --> ARMED : baseline established\n[all sensors nominal]
+
+ARMED --> LIGHT_SLEEP : poll interval elapsed\n[no event detected]
+
+LIGHT_SLEEP --> ARMED : sensor IRQ\n[event candidate]
+LIGHT_SLEEP --> DEEP_SLEEP : sleep timer > configurable\nthreshold [no activity]
+
+DEEP_SLEEP --> ARMED : RTC wakeup\n[poll cycle]
+
+' ── Event paths ──────────────────────────────
+ARMED --> EVENT_DETECTED : PRESSURE DELTA > threshold\nor MOTION > threshold\nor BOTH
+LIGHT_SLEEP --> EVENT_DETECTED : sensor IRQ fires\n[during light sleep]
+
+EVENT_DETECTED --> SIGNING : event latched\n[compose payload]
+
+SIGNING --> TRANSMITTING : payload signed\n[BLE ready]
+
+TRANSMITTING --> COOLDOWN : TX complete\n[configurable timer starts]
+
+COOLDOWN --> ARMED : cooldown expired\n[rearm sensors]
+
+' ── Fault paths ──────────────────────────────
+CALIBRATING --> FAULT : sensor init failed\n[I2C error]
+ARMED --> FAULT : I2C error / sensor dropout
+TRANSMITTING --> FAULT : BLE TX failed\n[max retries exceeded]
+
+ARMED --> LOW_BATTERY : Vbat < threshold
+LIGHT_SLEEP --> LOW_BATTERY : Vbat < threshold
+DEEP_SLEEP --> LOW_BATTERY : Vbat < threshold
+
+LOW_BATTERY --> ARMED : charge detected\n[Vbat restored]
+LOW_BATTERY --> [*] : Vbat critical\n[shutdown]
+
+FAULT --> CALIBRATING : recovery success\n[auto-restart]
+FAULT --> [*] : unrecoverable\n[watchdog reset]
+
+' ── Tamper ───────────────────────────────────
+ARMED --> EVENT_DETECTED : NODE TAMPER\ndetected [case open\nor voltage spike]
+LIGHT_SLEEP --> EVENT_DETECTED : NODE TAMPER\ndetected
+
+note right of ARMED
+  <color:#27AE60>Each sensor monitored
+  independently — baro OR
+  IMU alone is sufficient
+  to trigger EVENT_DETECTED</color>
+end note
+
+note right of DEEP_SLEEP
+  <color:#27AE60>Entered after configurable
+  inactivity period from
+  LIGHT_SLEEP — BLE suspended
+  RTC wakeup only</color>
+end note
+
+note right of FAULT
+  <color:#FF6B35>BLE connection lost:
+  queue events locally
+  retry on reconnect
+  —
+  Sensor I2C error:
+  attempt re-init x3
+  then watchdog reset</color>
+end note
+
+note right of COOLDOWN
+  <color:#27AE60>Prevents event storm
+  after trigger — duration
+  configurable per deployment
+  e.g. vehicle vs rack</color>
+end note
+
+@enduml
