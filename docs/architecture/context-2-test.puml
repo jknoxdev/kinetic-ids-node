@@ -16,7 +16,7 @@ skinparam {
     RectangleFontSize 13
     PackageBorderColor #FF6B35
     PackageBorderThickness 2
-    PackageBackgroundColor #1a1a2e
+    PackageBackgroundColor #ff0040
     PackageFontColor #FF6B35
     PackageFontSize 13
     ActorBorderColor #7EC8E3
