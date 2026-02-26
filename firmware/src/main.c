@@ -2,8 +2,8 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/logging/log.h>
 
-/* L.I.M.A. Status Blinker: 3.03Hz*/
-#define SLEEP_TIME_MS 110
+/* L.I.M.A. Status Blinker: 4.5 Hz*/
+#define SLEEP_TIME_MS 60
 #define LED0_NODE DT_ALIAS(led0)
 
 LOG_MODULE_REGISTER(lima, LOG_LEVEL_DBG);
