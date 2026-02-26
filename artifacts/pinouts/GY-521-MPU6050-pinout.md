@@ -9,16 +9,16 @@
 
 ## Pin Connections
 
-| GY-521 Pin | Connect To | Notes |
+| GY-521 | nRF52840 | Notes |
 |---|---|---|
 | VCC | 3.3V | **Do not use 5V** — connect to 3.3V, bypasses regulator |
 | GND | GND | |
-| SCL | nRF52840 SCL | I2C clock |
-| SDA | nRF52840 SDA | I2C bidirectional  |
-| INT | nRF52840 GPIO | Interrupt low on m-threshold, ARMED → EVENT_DETECTED |
+| SCL |  SCL | I2C clock |
+| SDA | SDA | I2C bidirectional  |
+| INT | GPIO P6 | Interrupt low on m-threshold, ARMED → EVENT_DETECTED |
 | AD0 | GND | I2C address select — GND = 0x68 (default), 3.3V = 0x69 |
-| XDA | unused in mvp | Aux Data — secondary I2C bus for external magnetometer |
-| XCL | unused in mvp  | Aux Clock — pairs with XDA |
+| XDA | - | Aux Data — secondary I2C bus for external magnetometer |
+| XCL | - | Aux Clock — pairs with XDA |
 
 ---
 
