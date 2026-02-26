@@ -62,12 +62,62 @@ This installs ARM GCC, CMake, Ninja, and all build tools automatically.
 
 ---
 
-## 3. Install West + Python Virtual Environment
+## 3.a Install Zephyr SDK (Toolchain)
+
+The Zephyr SDK provides the ARM cross-compiler required to build firmware.
+
+<details>
+<summary>🐧 Linux</summary>
+
+```bash
+cd ~
+wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/zephyr-sdk-0.16.8_linux-x86_64.tar.xz
+tar xf zephyr-sdk-0.16.8_linux-x86_64.tar.xz
+cd zephyr-sdk-0.16.8
+./setup.sh
+rm ~/zephyr-sdk-0.16.8_linux-x86_64.tar.xz
+```
+</details>
+
+<details>
+<summary>🍎 macOS</summary>
+
+```bash
+cd ~
+# Apple Silicon:
+wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/zephyr-sdk-0.16.8_macos-aarch64.tar.xz
+# Intel / x86 Silicon:
+# wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/zephyr-sdk-0.16.8_macos-x86_64.tar.xz
+tar xf zephyr-sdk-0.16.8_macos-*.tar.xz
+cd zephyr-sdk-0.16.8
+./setup.sh
+rm ~/zephyr-sdk-0.16.8_macos-*.tar.xz
+```
+</details>
+
+<details>
+<summary>🪟 Windows</summary>
+
+Download and run the installer from the [Zephyr SDK releases page](https://github.com/zephyrproject-rtos/sdk-ng/releases/tag/v0.16.8) — pick `zephyr-sdk-0.16.8_windows-x86_64.exe`.
+</details>
+
+> ⚠️ Install to `~` or `~/.local` — CMake searches these paths automatically. Installing elsewhere requires setting `ZEPHYR_SDK_INSTALL_DIR` manually.
+
+
+
+## 3.b Install West + Python Virtual Environment
+
+cd into your west root directory. Note, this will be the root for the west virtual installation, and the code repository will be nested within it as so: 
+
+>lima-ws/lima-node
 
 <details>
 <summary>🐧 Linux / 🍎 macOS</summary>
 
 ```bash
+mkdir ~/$normal_repository_dir/lima-ws
+mkdir ~/$normal_repository_dir/lima-ws/$cloned_project
+cd ~/$normal_repository_dir/lima-ws
 python3 -m venv .venv
 source .venv/bin/activate
 pip install west
@@ -78,6 +128,9 @@ pip install west
 <summary>🪟 Windows (PowerShell)</summary>
 
 ```powershell
+mkdir ~/$normal_repository_dir/lima-ws
+mkdir ~/$normal_repository_dir/lima-ws/$cloned_project
+cd ~/$normal_repository_dir/lima-ws
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install west
@@ -105,7 +158,7 @@ This pulls Zephyr, Nordic NCS, MCUboot, and all HAL modules. Takes 5-15 minutes 
 ```bash
 # All platforms — venv must be active
 pip install -r zephyr/scripts/requirements.txt
-pip install -r nrf/scripts/requirements.txt
+pip install -r sdk-nrf/scripts/requirements.txt
 pip install -r bootloader/mcuboot/scripts/requirements.txt
 ```
 
@@ -173,6 +226,18 @@ Install extensions:
 <summary>🐧 Linux / 🍎 macOS</summary>
 
 ```bash
+# codium on macos
+codium --install-extension nordic-semiconductor.nrf-connect
+codium --install-extension ms-vscode.cmake-tools
+codium --install-extension ms-vscode.cpptools
+
+# codium on linux
+codium --install-extension nordic-semiconductor.nrf-connect
+codium --install-extension ms-vscode.cmake-tools
+codium --install-extension llvm-vs-code-extensions.vscode-clangd
+codium --install-extension twxs.cmake
+
+# for m$ version
 code --install-extension nordic-semiconductor.nrf-connect
 code --install-extension ms-vscode.cmake-tools
 code --install-extension ms-vscode.cpptools
