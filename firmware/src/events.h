@@ -45,6 +45,7 @@ typedef enum {
     LIMA_EVT_COOLDOWN_EXPIRED   = 0x15,  /* Cooldown timer done → rearm         */
     LIMA_EVT_TX_COMPLETE        = 0x16,  /* BLE advertisement confirmed         */
     LIMA_EVT_SIGNING_COMPLETE   = 0x17,  /* Payload signed and ready            */
+    LIMA_EVT_TX_TIMEOUT         = 0x18,  /* TX did not confirm in time          */
 
 } lima_event_type_t;
 
