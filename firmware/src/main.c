@@ -1092,6 +1092,28 @@ K_THREAD_DEFINE(sensor_thread, SENSOR_STACK_SIZE,
                 sensor_thread_fn, NULL, NULL, NULL,
                 SENSOR_THREAD_PRIORITY, 0, 0);
 
+
+
+/* ── FSM Hardware Stubs ────────────────────────────────────────────────── */
+/* These will be filled in once the o-scope arrives! */
+
+void fsm_hw_enter_sleep(void) {
+    LOG_INF("HAL: Entering Light Sleep (System ON)");
+    // k_cpu_idle(); 
+}
+
+void fsm_hw_enter_deep_sleep(void) {
+    LOG_INF("HAL: Entering Deep Sleep (System OFF)");
+    // sys_power_state_set();
+}
+
+void fsm_hw_set_led(lima_state_t state) {
+    /* Move your existing LED logic from fsm_dispatch to here */
+    /* This keeps the logic in fsm.c and the 'pins' in main.c */
+}
+
+
+
 /* ── main ────────────────────────────────────────────────────────────────── */
 
 int main(void)
