@@ -28,10 +28,7 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/logging/log.h>
 #include <math.h>
-
 #include "events.h"
-
-
 
 #define I2C0_SCL_PIN 19
 #define I2C0_SDA_PIN 20
@@ -46,19 +43,14 @@
 
 #define FSM_MSGQ_DEPTH          16
 #define FSM_THREAD_PRIORITY     5
-
 #define SENSOR_THREAD_PRIORITY  6
-
 #define POLL_INTERVAL_MS        60      /* 16.67 Hz — matches your working blinky */
 #define COOLDOWN_MS_DEFAULT     5000    /* 5s default; tune per deployment         */
 #define SLEEP_INACTIVITY_MS     30000   /* 30s no event → deep sleep               */
 #define MAX_FAULT_RETRIES       3
-
 #define MOTION_THRESHOLD_G      0.80     /* 1.1 good for table top     */
-
 #define FSM_STACK_SIZE          8192  // Double it again
 #define SENSOR_STACK_SIZE       4096  // Double it again
-
 #define TX_TIMEOUT_MS           1500     /* tune later */
 
 
@@ -160,9 +152,6 @@ static void state_low_battery_handle(const lima_event_t *evt);
 /* Threads */
 static void sensor_thread_fn(void *p1, void *p2, void *p3);
 static void fsm_thread_fn(void *p1, void *p2, void *p3);
-
-
-
 
 /* ── Timing and LEDS  ─────────────────────────────────────────────────── */
 
