@@ -2,18 +2,21 @@
 #define LIMA_FSM_H
 
 #include <zephyr/kernel.h>
+#include <stdbool.h>
 
 /* ── State Definitions ───────────────────────────────────────────────────── */
 typedef enum {
     STATE_BOOT,
     STATE_CALIBRATING,
     STATE_ARMED,
+    STATE_LIGHT_SLEEP,    /* System ON: CPU idle, RAM on, fast wakeup */
+    STATE_DEEP_SLEEP,     /* System OFF: Lowest power, RAM off, Reset wakeup */
     STATE_EVENT_DETECTED,
     STATE_SIGNING,
     STATE_TRANSMITTING,
     STATE_COOLDOWN,
     STATE_FAULT,
-    STATE_COUNT /* Useful for array bounds checking */
+    STATE_COUNT
 } lima_state_t;
 
 /* ── Event Definitions ───────────────────────────────────────────────────── */
@@ -21,48 +24,44 @@ typedef enum {
     LIMA_EVT_INIT_COMPLETED,
     LIMA_EVT_SENSOR_TRIGGER,
     LIMA_EVT_SIGNING_DONE,
-    LIMA_EVT_TX_COMPLETE,     /* Asynchronous BLE trigger */
-    LIMA_EVT_TX_FAILED,       /* Broker retry logic trigger */
+    LIMA_EVT_TX_COMPLETE,
+    LIMA_EVT_TX_FAILED,
+    LIMA_EVT_GOTO_SLEEP,      /* Trigger for Light Sleep */
+    LIMA_EVT_GOTO_DEEP_SLEEP, /* Trigger for System OFF */
+    LIMA_EVT_WAKEUP,
     LIMA_EVT_TIMEOUT,
     LIMA_EVT_ERROR
 } lima_event_type_t;
 
-/* ── Event Message Structure ─────────────────────────────────────────────── */
 typedef struct {
     lima_event_type_t type;
     uint32_t timestamp;
-    int code;                /* Optional error or status code */
 } fsm_event_msg_t;
 
-/* ── Public API ──────────────────────────────────────────────────────────── */
+/* ── FSM Logic API ───────────────────────────────────────────────────────── */
 
-/**
- * @brief Initializes the FSM internal variables. 
- * Call this in main() before resuming threads.
- */
 void fsm_init(void);
-
-/**
- * @brief Core dispatcher. Routes events to state handlers.
- */
 void fsm_dispatch(fsm_event_msg_t *evt);
-
-/**
- * @brief Returns the current state. Useful for threads that need to poll 
- * state without being part of the FSM loop.
- */
 lima_state_t fsm_get_state(void);
-
-/**
- * @brief Helper to convert state enum to string for logging.
- */
 const char* fsm_state_to_str(lima_state_t state);
 
+/* ── Hardware Abstraction Hooks (The "Stubs" for main.c) ────────────────── */
+
 /**
- * @brief Abstracted LED control. 
- * Allows the FSM logic to say "I'm in FAULT" without knowing which 
- * specific GPIO pin is the Red LED.
+ * @brief Light Sleep (System ON). 
+ * CPU stops, but peripheral state and RAM are preserved.
  */
-void fsm_set_led_by_state(lima_state_t state);
+void fsm_hw_enter_sleep(void);
+
+/**
+ * @brief Deep Sleep (System OFF). 
+ * chip powers down almost entirely. Next wakeup is a reboot.
+ */
+void fsm_hw_enter_deep_sleep(void);
+
+/**
+ * @brief Updates physical LEDs based on the FSM state.
+ */
+void fsm_hw_set_led(lima_state_t state);
 
 #endif /* LIMA_FSM_H */
