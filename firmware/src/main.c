@@ -1081,22 +1081,51 @@ void fsm_hw_enter_deep_sleep(void) {
     // sys_power_state_set();
 }
 
-/* Add these to the bottom of main.c */
+/**
+ * @brief Physical hardware response to state changes.
+ * Called by fsm.c during transitions.
+ */
 void fsm_hw_set_led(lima_state_t state) {
+    /* Reset all colors first for a clean slate */
+    gpio_pin_set_dt(&led_r, 0);
+    gpio_pin_set_dt(&led_g, 0);
+    gpio_pin_set_dt(&led_b, 0);
+
     switch (state) {
         case STATE_BOOT:
-            gpio_pin_set_dt(&led_r, 1); gpio_pin_set_dt(&led_g, 1); gpio_pin_set_dt(&led_b, 1);
+            /* White (R+G+B) for initialization */
+            gpio_pin_set_dt(&led_r, 1);
+            gpio_pin_set_dt(&led_g, 1);
+            gpio_pin_set_dt(&led_b, 1);
             break;
+
         case STATE_ARMED:
-            gpio_pin_set_dt(&led_r, 0); gpio_pin_set_dt(&led_g, 0);
+            /* Start heartbeat (Blue pulse) */
             k_timer_start(&heartbeat_timer, K_MSEC(100), K_MSEC(100));
             break;
-        case STATE_FAULT:
-            k_timer_stop(&heartbeat_timer);
-            gpio_pin_set_dt(&led_r, 1); gpio_pin_set_dt(&led_g, 0); gpio_pin_set_dt(&led_b, 0);
+
+        case STATE_EVENT_DETECTED:
+        case STATE_SIGNING:
+        case STATE_TRANSMITTING:
+            /* Solid Red during activity */
+            gpio_pin_set_dt(&led_r, 1);
             break;
+
+        case STATE_COOLDOWN:
+            /* Yellow (R+G) for cooldown/suppression */
+            gpio_pin_set_dt(&led_r, 1);
+            gpio_pin_set_dt(&led_g, 1);
+            break;
+
+        case STATE_FAULT:
+            /* Rapid Red flash or solid red (Safety first) */
+            k_timer_stop(&heartbeat_timer);
+            gpio_pin_set_dt(&led_r, 1);
+            LOG_ERR("HARDWARE: Fault LED Asserted");
+            break;
+
         default:
-            gpio_pin_set_dt(&led_r, 0); gpio_pin_set_dt(&led_g, 0); gpio_pin_set_dt(&led_b, 0);
+            /* Dark for sleep states */
             break;
     }
 }

@@ -625,3 +625,12 @@ void fsm_init(void) {
 
     LOG_INF("FSM: Entered %s", fsm_state_to_str(current_state));
 }
+
+
+/**
+ * @brief Thread-safe getter for the current FSM state
+ */
+lima_state_t fsm_get_state(void) {
+    return current_state;
+}
+
