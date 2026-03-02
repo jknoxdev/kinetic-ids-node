@@ -74,20 +74,15 @@ int lima_post_event(const lima_event_t *evt)
     return k_msgq_put(&fsm_msgq, evt, K_NO_WAIT);
 }
 
-
-
 /* Non-blocking timer for cooldown */
 static struct k_work_delayable cooldown_work; 
 
 /* Non-blocking timer tx timeout */
 static struct k_work_delayable tx_timeout_work;
 
-
-
 /* Threads */
 static void sensor_thread_fn(void *p1, void *p2, void *p3);
 static void fsm_thread_fn(void *p1, void *p2, void *p3);
-
 
 
 /* ── Heartbeat timer (ARMED state blue pulse) ────────────────────────────── */
@@ -249,7 +244,6 @@ static void __attribute__((unused)) suppress_stub_warnings(void)
     (void)hw_notify_low_battery;
 }
 
-
 /* ── fsm_hw_* Trampolines (called by fsm.c) ──────────────────────────────── */
 
 void fsm_hw_enter_sleep(void)
@@ -320,7 +314,6 @@ void fsm_hw_set_led(lima_state_t state)
     }
 }
 
-
 /* ── Sensor Thread ───────────────────────────────────────────────────────── */
 
 static void sensor_thread_fn(void *p1, void *p2, void *p3)
@@ -378,13 +371,7 @@ K_THREAD_DEFINE(fsm_thread, FSM_STACK_SIZE,
 K_THREAD_DEFINE(sensor_thread, SENSOR_STACK_SIZE,
                 sensor_thread_fn, NULL, NULL, NULL,
                 SENSOR_THREAD_PRIORITY, 0, 0);
-
-
-
                 
-
-
-
 /* ── main ────────────────────────────────────────────────────────────────── */
 
 int main(void)
