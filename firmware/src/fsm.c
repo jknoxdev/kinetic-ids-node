@@ -163,32 +163,48 @@ static void tx_timeout_cb(struct k_work *work)
 
 
 
+/* ── State: BOOT ─────────────────────────────────────────────────────────── */
+
+static void state_boot_enter(void)
+{
+    LOG_INF("BOOT: initializing");
+    /* Hardware init is handled by main.c before fsm_init() is called.
+       If sensors failed, main.c should post LIMA_EVT_ERROR before this runs.
+       On success, post INIT_COMPLETE to drive the transition. */
+    lima_event_t e = {
+        .type         = LIMA_EVT_INIT_COMPLETE,
+        .timestamp_ms = k_uptime_get_32(),
+    };
+    lima_post_event(&e);
+}
+
+
+
+
+
+
+
+/* ── State: CALIBRATING ──────────────────────────────────────────────────── */
 
 static void state_calibrating_enter(void)
 {
-    LOG_INF("CALIBRATING: enter function reached");  // ← add this
-    // led_blink(2);
     LOG_INF("CALIBRATING: warming up sensors");
-
-    int rc = hw_calibrate();
-    if (rc != 0) {
-        LOG_ERR("CALIBRATING: sensor error rc=%d -> FAULT", rc);
-        transition(STATE_FAULT);
-        return;
-    }
-
-    LOG_INF("CALIBRATING: baseline ready -> ARMED");
-    transition(STATE_ARMED);
-
-    // /* kick FSM thread to run ARMED entry */
-    // lima_event_t e = {
-    //     .type         = LIMA_EVT_POLL_TICK,
-    //     .timestamp_ms = k_uptime_get_32(),
-    // };
-    // lima_post_event(&e);
-    LOG_INF("CALIBRATING: kicked event");
-
+    /* Calibration is a stub; a real impl would be async and post
+       LIMA_EVT_BASELINE_READY when done. For now post it directly. */
+    lima_event_t e = {
+        .type         = LIMA_EVT_BASELINE_READY,
+        .timestamp_ms = k_uptime_get_32(),
+    };
+    lima_post_event(&e);
 }
+
+
+
+
+
+
+
+
 
 /*
  * STATE_ARMED
@@ -635,10 +651,6 @@ static void state_low_battery_handle(const lima_event_t *evt)
 
 /* ── Implementation of Internal Handlers ────────────────────────────────── */
 
-static void state_boot_enter(void) {
-    LOG_INF("FSM: Entering BOOT");
-    fsm_hw_set_led(STATE_BOOT);
-}
 
 static void state_armed_enter(void) {
     LOG_INF("FSM: System ARMED");
