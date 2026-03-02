@@ -21,8 +21,13 @@ lima_fsm_ctx_t fsm = {
 /* ── Internal State (Private to this file) ──────────────────────────────── */
 static lima_state_t current_state = STATE_BOOT;
 
-/* ── Forward Declarations of Static Handlers ────────────────────────────── */
-/* This stops the "Implicit Declaration" warnings */
+/* timeouts and their (handlers */
+static struct k_work_delayable cooldown_work;
+static struct k_work_delayable tx_timeout_work;
+
+/* ── Forward Declarations ────────────────────────────────────────────────── */
+
+
 static void state_boot_enter(void);
 static void state_armed_enter(void);
 static void state_armed_handle(const lima_event_t *evt);
