@@ -49,12 +49,11 @@ LOG_MODULE_REGISTER(lima_main, LOG_LEVEL_INF);
 #define SENSOR_THREAD_PRIORITY  6
 #define POLL_INTERVAL_MS        60      /* 16.67 Hz — matches your working blinky */
 #define COOLDOWN_MS_DEFAULT     5000    /* 5s default; tune per deployment         */
-#define SLEEP_INACTIVITY_MS     30000   /* 30s no event → deep sleep               */
-#define MAX_FAULT_RETRIES       3
 #define MOTION_THRESHOLD_G      0.80     /* 1.1 good for table top     */
 #define FSM_STACK_SIZE          8192  // Double it again
 #define SENSOR_STACK_SIZE       4096  // Double it again
-#define TX_TIMEOUT_MS           1500     /* tune later */
+
+
 
 /* ── Hardware globals ────────────────────────────────────────────────────── */
 
