@@ -1081,11 +1081,6 @@ void fsm_hw_enter_deep_sleep(void) {
     // sys_power_state_set();
 }
 
-void fsm_hw_set_led(lima_state_t state) {
-    /* Move your existing LED logic from fsm_dispatch to here */
-    /* This keeps the logic in fsm.c and the 'pins' in main.c */
-}
-
 /* Add these to the bottom of main.c */
 void fsm_hw_set_led(lima_state_t state) {
     switch (state) {
