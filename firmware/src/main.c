@@ -31,6 +31,8 @@
 #include "events.h"
 #include "fsm.h"
 
+LOG_MODULE_REGISTER(lima_main, LOG_LEVEL_INF);
+
 #define I2C0_SCL_PIN 19
 #define I2C0_SDA_PIN 20
 
@@ -54,21 +56,26 @@
 #define SENSOR_STACK_SIZE       4096  // Double it again
 #define TX_TIMEOUT_MS           1500     /* tune later */
 
-
-
-int lima_post_event(const lima_event_t *evt);
-
-LOG_MODULE_REGISTER(lima_fsm);
-
 /* ── Hardware globals ────────────────────────────────────────────────────── */
 
-// static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 static const struct gpio_dt_spec led_r = GPIO_DT_SPEC_GET(LED_R_NODE, gpios);
 static const struct gpio_dt_spec led_g = GPIO_DT_SPEC_GET(LED_G_NODE, gpios);
 static const struct gpio_dt_spec led_b = GPIO_DT_SPEC_GET(LED_B_NODE, gpios);
 
 static const struct device *mpu;
 static struct sensor_value accel[3];
+
+/* ── Message queue ───────────────────────────────────────────────────────── */
+
+K_MSGQ_DEFINE(fsm_msgq, sizeof(lima_event_t), FSM_MSGQ_DEPTH, 4);
+
+int lima_post_event(const lima_event_t *evt)
+{
+    return k_msgq_put(&fsm_msgq, evt, K_NO_WAIT);
+}
+
+
+
 
 /* Non-blocking timer for cooldown */
 static struct k_work_delayable cooldown_work; 
