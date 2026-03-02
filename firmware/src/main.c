@@ -109,29 +109,7 @@ static void heartbeat_expiry_fn(struct k_timer *timer_id)
 
 
 
-static void tx_timeout_cb(struct k_work *work)
-{
-    lima_event_t e = {
-        .type         = LIMA_EVT_TX_TIMEOUT,
-        .timestamp_ms = k_uptime_get_32(),
-    };
-    LOG_WRN("TRANSMITTING: timeout -> forcing COOLDOWN");
-    lima_post_event(&e);
-}
 
-
-/* ── Work Queue Callback ─────────────────────────────────────────────────── */
-
-static void cooldown_expiry_cb(struct k_work *work)
-{
-    lima_event_t e = {
-        .type         = LIMA_EVT_COOLDOWN_EXPIRED,
-        .timestamp_ms = k_uptime_get_32(),
-    };
-    
-    LOG_INF("COOLDOWN: timer expired, notifying FSM ");
-    lima_post_event(&e);
-}
 
 /* ── Message queue ───────────────────────────────────────────────────────── */
 
@@ -142,6 +120,19 @@ int lima_post_event(const lima_event_t *evt) {
     /* Send the actual data to the queue */
     return k_msgq_put(&fsm_msgq, evt, K_NO_WAIT); 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* ── Hardware drivers ────────────────────────────────────────────────────── */
