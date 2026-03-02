@@ -545,23 +545,18 @@ static void state_low_battery_handle(const lima_event_t *evt)
 /* ── Public API ──────────────────────────────────────────────────────────── */
 
 
-/**
- * @brief Initializes the FSM to the starting state.
- */
-void fsm_init(void) {
-    LOG_INF("FSM: Initializing...");
+void fsm_init(void)
+{
+    LOG_INF("FSM: Initializing work items");
 
-    /* Start at the very beginning */
+    k_work_init_delayable(&cooldown_work, cooldown_expiry_cb);
+    k_work_init_delayable(&tx_timeout_work, tx_timeout_cb);
+
     current_state = STATE_BOOT;
-
-    /* Optional: Trigger any specific startup hardware logic here, 
-       like turning on a 'System Booting' LED */
     fsm_hw_set_led(STATE_BOOT);
 
-    LOG_INF("FSM: Entered %s", fsm_state_to_str(current_state));
+    LOG_INF("FSM: Initialized in %s", fsm_state_to_str(current_state));
 }
-
-
 
 
 
