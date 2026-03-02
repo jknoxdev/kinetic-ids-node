@@ -254,8 +254,6 @@ static void state_armed_handle(const lima_event_t *evt)
 
 
 
-
-
 /* ── State: LIGHT_SLEEP ──────────────────────────────────────────────────── */
 
 static void state_light_sleep_enter(void)
@@ -302,16 +300,13 @@ static void state_light_sleep_handle(const lima_event_t *evt)
     }
 }
 
-/*
- * STATE_DEEP_SLEEP
- * BLE off, all peripherals suspended.
- * RTC wakeup only -> back to ARMED.
- */
+
+/* ── State: DEEP_SLEEP ───────────────────────────────────────────────────── */
+
 static void state_deep_sleep_enter(void)
 {
     LOG_INF("DEEP SLEEP: BLE off, RTC wakeup only");
-    hw_ble_stop();
-    hw_enter_deep_sleep();
+    fsm_hw_enter_deep_sleep();
 }
 
 static void state_deep_sleep_handle(const lima_event_t *evt)
@@ -319,7 +314,6 @@ static void state_deep_sleep_handle(const lima_event_t *evt)
     switch (evt->type) {
     case LIMA_EVT_RTC_WAKEUP:
         LOG_INF("DEEP SLEEP: RTC wakeup -> ARMED");
-        /* TODO: reinit BLE stack */
         transition(STATE_ARMED);
         break;
 
@@ -329,10 +323,15 @@ static void state_deep_sleep_handle(const lima_event_t *evt)
         break;
 
     default:
-        LOG_WRN("DEEP_SLEEP: unhandled event type=%d", evt->type);
+        LOG_WRN("DEEP_SLEEP: unhandled event 0x%02X", evt->type);
         break;
     }
 }
+
+
+
+
+
 
 /*
  * STATE_EVENT_DETECTED
