@@ -29,6 +29,7 @@
 #include <zephyr/logging/log.h>
 #include <math.h>
 #include "events.h"
+#include "fsm.h"
 
 #define I2C0_SCL_PIN 19
 #define I2C0_SDA_PIN 20

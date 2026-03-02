@@ -19,7 +19,7 @@ extern "C" {
 /* ── Event types ──────────────────────────────────────────────────────────── */
 
 typedef enum {
-    /* Sensor triggers */
+    /* ── Sensor Triggers (0x01 - 0x07) ───────────────────────────────────── */
     LIMA_EVT_PRESSURE_BREACH    = 0x01,  /* BMP280: pressure delta > threshold  */
     LIMA_EVT_MOTION_DETECTED    = 0x02,  /* MPU6050: acceleration > threshold   */
     LIMA_EVT_DUAL_BREACH        = 0x03,  /* Both sensors triggered              */
