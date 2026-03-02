@@ -538,12 +538,7 @@ static void state_low_battery_handle(const lima_event_t *evt)
     }
 }
 
-
-
-
-
 /* ── Public API ──────────────────────────────────────────────────────────── */
-
 
 void fsm_init(void)
 {
@@ -558,45 +553,44 @@ void fsm_init(void)
     LOG_INF("FSM: Initialized in %s", fsm_state_to_str(current_state));
 }
 
-
-
-/**
- * @brief Thread-safe getter for the current FSM state
- */
-lima_state_t fsm_get_state(void) {
+lima_state_t fsm_get_state(void)
+{
     return current_state;
 }
 
+void fsm_dispatch(const lima_event_t *evt)
+{
+    /* Lifecycle events that drive boot sequencing */
+    if (current_state == STATE_BOOT && evt->type == LIMA_EVT_INIT_COMPLETE) {
+        transition(STATE_CALIBRATING);
+        return;
+    }
+    if (current_state == STATE_CALIBRATING && evt->type == LIMA_EVT_BASELINE_READY) {
+        transition(STATE_ARMED);
+        return;
+    }
 
+    /* Route event to the active state's handler */
+    switch (current_state) {
+    case STATE_ARMED:          state_armed_handle(evt);          break;
+    case STATE_LIGHT_SLEEP:    state_light_sleep_handle(evt);    break;
+    case STATE_DEEP_SLEEP:     state_deep_sleep_handle(evt);     break;
+    case STATE_SIGNING:        state_signing_handle(evt);        break;
+    case STATE_TRANSMITTING:   state_transmitting_handle(evt);   break;
+    case STATE_COOLDOWN:       state_cooldown_handle(evt);       break;
+    case STATE_FAULT:          state_fault_handle(evt);          break;
+    case STATE_LOW_BATTERY:    state_low_battery_handle(evt);    break;
 
-/* ── The Dispatcher ─────────────────────────────────────────────────────── */
- void fsm_dispatch(const lima_event_t *evt) {
-    while (1) {
-        static lima_state_t last_state = (lima_state_t)-1;
+    /* Transient entry-only states — no external events handled */
+    case STATE_BOOT:
+    case STATE_CALIBRATING:
+    case STATE_EVENT_DETECTED:
+        LOG_WRN("FSM: event 0x%02X in transient state %s — ignored",
+                evt->type, fsm_state_to_str(current_state));
+        break;
 
-        if (current_state != last_state) {
-            last_state = current_state;
-
-            switch (current_state) {
-                case STATE_BOOT:        state_boot_enter();        break;
-                case STATE_ARMED:       state_armed_enter();       break;
-                case STATE_FAULT:       fsm_hw_set_led(STATE_FAULT); break;
-                default: break;
-            }
-            continue; /* Run entry logic immediately */
-        }
+    default:
+        LOG_ERR("FSM: dispatch in unknown state %d", current_state);
         break;
     }
-
-    /* Route the event to the current state handler */
-    switch (current_state) {
-        case STATE_ARMED:   state_armed_handle(evt);   break;
-        default: break;
-    }
 }
-
-/* ── Implementation of Internal Handlers ────────────────────────────────── */
-
-
-
-
