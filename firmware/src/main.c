@@ -263,6 +263,63 @@ void fsm_hw_enter_deep_sleep(void)
     hw_ble_stop();
 }
 
+/**
+ * @brief Physical hardware response to FSM state changes.
+ *        Called by fsm.c during every transition.
+ */
+void fsm_hw_set_led(lima_state_t state)
+{
+    /* Stop the heartbeat before changing LEDs; restart it only for ARMED */
+    k_timer_stop(&heartbeat_timer);
+
+    gpio_pin_set_dt(&led_r, 0);
+    gpio_pin_set_dt(&led_g, 0);
+    gpio_pin_set_dt(&led_b, 0);
+
+    switch (state) {
+    case STATE_BOOT:
+    case STATE_CALIBRATING:
+        /* White (R+G+B) during init */
+        gpio_pin_set_dt(&led_r, 1);
+        gpio_pin_set_dt(&led_g, 1);
+        gpio_pin_set_dt(&led_b, 1);
+        break;
+
+    case STATE_ARMED:
+        /* Blue double-blink heartbeat */
+        k_timer_start(&heartbeat_timer, K_MSEC(100), K_MSEC(100));
+        break;
+
+    case STATE_EVENT_DETECTED:
+    case STATE_SIGNING:
+    case STATE_TRANSMITTING:
+        /* Solid Red during active alert pipeline */
+        gpio_pin_set_dt(&led_r, 1);
+        break;
+
+    case STATE_COOLDOWN:
+        /* Yellow (R+G) during suppression window */
+        gpio_pin_set_dt(&led_r, 1);
+        gpio_pin_set_dt(&led_g, 1);
+        break;
+
+    case STATE_FAULT:
+        /* Solid Red + log */
+        gpio_pin_set_dt(&led_r, 1);
+        LOG_ERR("HARDWARE: Fault LED asserted");
+        break;
+
+    case STATE_LOW_BATTERY:
+        /* Dim amber: just Red at low duty — use solid for simplicity now */
+        gpio_pin_set_dt(&led_r, 1);
+        break;
+
+    default:
+        /* Dark for sleep states */
+        break;
+    }
+}
+
 
 
 /* ── Sensor thread — real MPU6050 polling at 16.67 Hz ───────────────────── */
