@@ -250,6 +250,16 @@ static void __attribute__((unused)) suppress_stub_warnings(void)
 }
 
 
+/* ── fsm_hw_* Trampolines (called by fsm.c) ──────────────────────────────── */
+
+void fsm_hw_enter_sleep(void)
+{
+    hw_enter_light_sleep();
+}
+
+
+
+
 
 /* ── Sensor thread — real MPU6050 polling at 16.67 Hz ───────────────────── */
 
@@ -292,25 +302,7 @@ static void sensor_thread_fn(void *p1, void *p2, void *p3)
 
 /* ── FSM thread ──────────────────────────────────────────────────────────── */
 
-static void fsm_thread_fn(void *p1, void *p2, void *p3)
-{
-    LOG_INF("FSM thread resumed!");  // ← add this as very first line
-    ARG_UNUSED(p1); ARG_UNUSED(p2); ARG_UNUSED(p3);
 
-    LOG_INF("LIMA FSM thread started");
-
- 
-
-    lima_event_t msg;
-    fsm_init(); // Set initial state inside fsm.c
-
-    while (1) {
-        // Wait for message from queue...
-        if (k_msgq_get(&fsm_msgq, &msg, K_FOREVER) == 0) {
-            fsm_dispatch(&msg); // Send it to the brain
-        }
-    }
-}
 
 //  * Thread startup:
 //  *   Threads are defined with K_FOREVER (no auto-start).
