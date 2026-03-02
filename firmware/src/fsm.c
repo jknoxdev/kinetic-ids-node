@@ -328,13 +328,38 @@ static void state_deep_sleep_handle(const lima_event_t *evt)
     }
 }
 
+
+
+
+
+
+/*
+ * STATE_EVENT_DETECTED
+ * Latch trigger type + timestamp, hand off to SIGNING.
+ * The event data is already in fsm.last_event from the transition.
+ */
 static void state_event_detected_enter(void)
 {
-    LOG_INF("EVENT DETECTED: type=0x%02X at t=%u ms",
+    /* Heartbeat timer was stopped by state_armed_exit() automatically */
+    /* Turn LED solid ON to indicate a 'Triggered' state */
+
+    // gpio_pin_set_dt(&led, 1);
+
+    /* Red Alert! */
+    gpio_pin_set_dt(&led_r, 1);
+    gpio_pin_set_dt(&led_g, 0);
+    gpio_pin_set_dt(&led_b, 0);
+
+    LOG_INF("EVENT DETECTED: type=%d at t=%u ms",
             fsm.last_event.type,
             fsm.last_event.timestamp_ms);
 
-    /* Kick off async signing; stub posts SIGNING_COMPLETE synchronously */
+
+
+    hw_sign_event(&fsm.last_event);
+
+    /* In real impl, CryptoCell posts SIGNING_COMPLETE async.
+     * Stub posts it synchronously for now. */
     lima_event_t e = {
         .type         = LIMA_EVT_SIGNING_COMPLETE,
         .timestamp_ms = k_uptime_get_32(),
@@ -343,9 +368,6 @@ static void state_event_detected_enter(void)
 
     transition(STATE_SIGNING);
 }
-
-
-
 
 /*
  * STATE_SIGNING
