@@ -234,7 +234,7 @@ static void state_armed_handle(const lima_event_t *evt)
 static void state_light_sleep_enter(void)
 {
     LOG_INF("LIGHT SLEEP: low-power, sensor IRQs active");
-    hw_enter_light_sleep();
+    fsm_hw_enter_sleep();
 }
 
 static void state_light_sleep_handle(const lima_event_t *evt)
