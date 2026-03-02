@@ -321,43 +321,36 @@ void fsm_hw_set_led(lima_state_t state)
 }
 
 
-
-/* ── Sensor thread — real MPU6050 polling at 16.67 Hz ───────────────────── */
+/* ── Sensor Thread ───────────────────────────────────────────────────────── */
 
 static void sensor_thread_fn(void *p1, void *p2, void *p3)
 {
-    LOG_INF("FSM sensor thread resumed!");  // ← add this as very first line
     ARG_UNUSED(p1); ARG_UNUSED(p2); ARG_UNUSED(p3);
-
     LOG_INF("Sensor thread started");
 
-    /* Wait for FSM to finish BOOT + CALIBRATING before polling */
+    /* Wait for FSM to finish BOOT + CALIBRATING */
     k_sleep(K_MSEC(500));
 
     while (1) {
-        /* Only poll when FSM is in a watching state */
-        if (fsm_get_state() == STATE_ARMED || fsm_get_state() == STATE_LIGHT_SLEEP) {
+        lima_state_t s = fsm_get_state();
 
+        if (s == STATE_ARMED || s == STATE_LIGHT_SLEEP) {
             double magnitude = hw_read_imu();
 
-            /* Toggle LED as heartbeat — visible proof the node is alive */
-            // gpio_pin_toggle_dt(&led);
-
             if (magnitude > MOTION_THRESHOLD_G) {
-                LOG_INF("MOTION: magnitude=%.2f g (threshold=%.2f)",
-                        magnitude, MOTION_THRESHOLD_G);
+                LOG_INF("MOTION: %.2f g (threshold=%.2f)", magnitude, MOTION_THRESHOLD_G);
 
                 lima_event_t e = {
                     .type              = LIMA_EVT_MOTION_DETECTED,
                     .timestamp_ms      = k_uptime_get_32(),
                     .data.imu.accel_g  = (float)magnitude,
-                    .data.imu.gyro_dps = 0.0f, /* TODO: add gyro channel read */
+                    .data.imu.gyro_dps = 0.0f,
                 };
                 lima_post_event(&e);
             }
         }
 
-        k_msleep(POLL_INTERVAL_MS); /* 60ms = 16.67 Hz */
+        k_msleep(POLL_INTERVAL_MS);
     }
 }
 
@@ -383,60 +376,8 @@ K_THREAD_DEFINE(sensor_thread, SENSOR_STACK_SIZE,
 
 
 
-/* ── FSM Hardware Stubs ────────────────────────────────────────────────── */
-/* These will be filled in once the o-scope arrives! */
+                
 
-
-
-
-/**
- * @brief Physical hardware response to state changes.
- * Called by fsm.c during transitions.
- */
-void fsm_hw_set_led(lima_state_t state) {
-    /* Reset all colors first for a clean slate */
-    gpio_pin_set_dt(&led_r, 0);
-    gpio_pin_set_dt(&led_g, 0);
-    gpio_pin_set_dt(&led_b, 0);
-
-    switch (state) {
-        case STATE_BOOT:
-            /* White (R+G+B) for initialization */
-            gpio_pin_set_dt(&led_r, 1);
-            gpio_pin_set_dt(&led_g, 1);
-            gpio_pin_set_dt(&led_b, 1);
-            break;
-
-        case STATE_ARMED:
-            /* Start heartbeat (Blue pulse) */
-            k_timer_start(&heartbeat_timer, K_MSEC(100), K_MSEC(100));
-            break;
-
-        case STATE_EVENT_DETECTED:
-        case STATE_SIGNING:
-        case STATE_TRANSMITTING:
-            /* Solid Red during activity */
-            gpio_pin_set_dt(&led_r, 1);
-            break;
-
-        case STATE_COOLDOWN:
-            /* Yellow (R+G) for cooldown/suppression */
-            gpio_pin_set_dt(&led_r, 1);
-            gpio_pin_set_dt(&led_g, 1);
-            break;
-
-        case STATE_FAULT:
-            /* Rapid Red flash or solid red (Safety first) */
-            k_timer_stop(&heartbeat_timer);
-            gpio_pin_set_dt(&led_r, 1);
-            LOG_ERR("HARDWARE: Fault LED Asserted");
-            break;
-
-        default:
-            /* Dark for sleep states */
-            break;
-    }
-}
 
 
 /* ── main ────────────────────────────────────────────────────────────────── */
