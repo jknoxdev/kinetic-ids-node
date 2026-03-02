@@ -107,60 +107,24 @@ static void heartbeat_expiry_fn(struct k_timer *timer_id)
     tick = (tick + 1) % 20;
 }
 
+/* ── Hardware Abstraction Layer ──────────────────────────────────────────── */
 
-
-
-
-
-
-
-
-
-
-
-
-
-/* ── Hardware drivers ────────────────────────────────────────────────────── */
-
-/*
- * hw_init_sensors()
- * Real implementation — replaces stub.
- * Initializes MPU6050 and LED from device tree.
- */
 static int hw_init_sensors(void)
 {
-    /* MPU6050 */
     mpu = DEVICE_DT_GET_ANY(invensense_mpu6050);
 
     if (mpu == NULL) {
         LOG_ERR("MPU6050 device not found in devicetree!");
         return -ENODEV;
     }
-    
     if (!device_is_ready(mpu)) {
         LOG_ERR("MPU6050 not ready!");
         return -ENODEV;
     }
     LOG_INF("MPU6050 ready");
-
-
-
-    // /* LED heartbeat */
-    // if (!gpio_is_ready_dt(&led)) {
-    //     LOG_ERR("LED not ready!");
-    //     return -ENODEV;
-    // }
-    // gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
-    // LOG_INF("LED ready");
-
     return 0;
 }
 
-/*
- * hw_read_imu()
- * Fetch a fresh accel sample from the MPU6050.
- * Returns magnitude in g, populates global accel[].
- */
 static double hw_read_imu(void)
 {
     sensor_sample_fetch(mpu);
@@ -170,24 +134,19 @@ static double hw_read_imu(void)
     double ay = sensor_value_to_double(&accel[1]);
     double az = sensor_value_to_double(&accel[2]);
 
-     // Magnitude in m/s^2
-    double mag_ms2 = sqrt(ax*ax + ay*ay + az*az);
-    
+    double mag_ms2   = sqrt(ax * ax + ay * ay + az * az);
     double current_g = mag_ms2 / 9.80665;
+    double motion_g  = fabs(current_g - 1.0);
 
-    // Normalize: Subtract Earth's gravity (approx 9.806)
-    // and convert to Gs. This makes 'rest' approximately 0.0g.
-
-    // magnitue
-    // double mag_g = fabs((mag_ms2 / 9.80665) - 1.0);
-    // LOG_DBG("accel x:%.2f y:%.2f z:%.2f | G:%.2f", ax, ay, az, mag_g);
-    // return mag_g;
-
-    // g's
-    double motion_g = fabs(current_g - 1.0);
     LOG_DBG("Raw: %.2f m/s2 | Motion: %.2f G", mag_ms2, motion_g);
     return motion_g;
 }
+
+
+
+
+
+
 
 /* ── Remaining stubs (swap these in one at a time) ───────────────────────── */
 
