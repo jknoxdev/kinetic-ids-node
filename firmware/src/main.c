@@ -170,86 +170,84 @@ static void hw_i2c_bus_recovery(void)
 }
 
 
-
-
-
-/* ── Remaining stubs (swap these in one at a time) ───────────────────────── */
+/* ── HAL Stubs (swap in real implementations one at a time) ──────────────── */
 
 static int hw_calibrate(void)
 {
-    /* TODO: collect baseline pressure + accel samples, store to SRAM */
-    LOG_INF("[STUB] calibrate — using MPU6050 ready check as baseline");
+    LOG_INF("[STUB] calibrate");
     return 0;
 }
 
 static int hw_enable_irqs(void)
 {
-    /* TODO: configure MPU6050 interrupt pin via GPIO */
     LOG_INF("[STUB] enable_sensor_irqs");
     return 0;
 }
 
 static int hw_enter_light_sleep(void)
 {
-    /* TODO: disable non-critical peripherals via Zephyr PM */
     LOG_INF("[STUB] light_sleep");
     return 0;
 }
 
 static int hw_enter_deep_sleep(void)
 {
-    /* TODO: suspend all peripherals, BLE off, RTC wakeup only */
     LOG_INF("[STUB] deep_sleep");
     return 0;
 }
 
 static int hw_sign_event(lima_event_t *e)
 {
-    /* TODO: CryptoCell-310 ECDSA-P256 sign + per-event nonce */
-    LOG_INF("[STUB] sign_event type=%d", e->type);
+    LOG_INF("[STUB] sign_event type=0x%02X", e->type);
     return 0;
 }
 
 static int hw_ble_advertise(lima_event_t *e)
 {
-    /* TODO: BLE 5.0 Coded PHY advertisement with signed payload */
-    LOG_INF("[STUB] ble_advertise type=%d", e->type);
+    LOG_INF("[STUB] ble_advertise type=0x%02X", e->type);
     return 0;
 }
 
 static int hw_ble_stop(void)
 {
-    /* TODO: disable BLE stack for deep sleep */
     LOG_INF("[STUB] ble_stop");
     return 0;
 }
 
 static void hw_assert_fault_led(void)
 {
-    /* TODO: solid fault LED pattern (vs heartbeat blink) */
     LOG_INF("[STUB] assert_fault_led");
 }
 
 static int hw_try_recover(void)
 {
-    /* TODO: attempt I2C re-init x3 then watchdog reset */
     LOG_INF("[STUB] try_recover");
     return 0;
 }
 
 static void hw_watchdog_reset(void)
 {
-    /* TODO: trigger watchdog reset via Zephyr WDT API */
     LOG_INF("[STUB] watchdog_reset");
 }
 
 static void hw_notify_low_battery(void)
 {
-    /* TODO: BLE notify gateway of low battery state */
     LOG_INF("[STUB] notify_low_battery");
 }
 
-
+/* Suppress "defined but not used" warnings for stubs not yet wired */
+static void __attribute__((unused)) suppress_stub_warnings(void)
+{
+    (void)hw_calibrate;
+    (void)hw_enable_irqs;
+    (void)hw_sign_event;
+    (void)hw_ble_advertise;
+    (void)hw_ble_stop;
+    (void)hw_assert_fault_led;
+    (void)hw_try_recover;
+    (void)hw_watchdog_reset;
+    (void)hw_notify_low_battery;
+}
 
 
 
