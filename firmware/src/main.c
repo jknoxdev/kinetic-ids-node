@@ -980,7 +980,7 @@ static void sensor_thread_fn(void *p1, void *p2, void *p3)
 
     while (1) {
         /* Only poll when FSM is in a watching state */
-        if (fsm.current == STATE_ARMED || fsm.current == STATE_LIGHT_SLEEP) {
+        if (fsm_get_state() == STATE_ARMED || fsm_get_state() == STATE_LIGHT_SLEEP) {
 
             double magnitude = hw_read_imu();
 
