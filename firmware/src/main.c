@@ -142,7 +142,32 @@ static double hw_read_imu(void)
     return motion_g;
 }
 
+static void hw_i2c_bus_recovery(void)
+{
+    LOG_INF("BOOT: I2C bus recovery on P0.%d/P0.%d", I2C0_SCL_PIN, I2C0_SDA_PIN);
 
+    const struct device *gpio0_dev = DEVICE_DT_GET(DT_NODELABEL(gpio0));
+    if (!device_is_ready(gpio0_dev)) {
+        LOG_ERR("GPIO0 device not ready for recovery");
+        return;
+    }
+
+    gpio_pin_configure(gpio0_dev, I2C0_SCL_PIN, GPIO_OUTPUT_HIGH);
+    gpio_pin_configure(gpio0_dev, I2C0_SDA_PIN, GPIO_INPUT);
+
+    for (int i = 0; i < 9; i++) {
+        gpio_pin_set_raw(gpio0_dev, I2C0_SCL_PIN, 1);
+        k_busy_wait(5);
+        gpio_pin_set_raw(gpio0_dev, I2C0_SCL_PIN, 0);
+        k_busy_wait(5);
+    }
+    gpio_pin_set_raw(gpio0_dev, I2C0_SCL_PIN, 1);
+
+    gpio_pin_configure(gpio0_dev, I2C0_SCL_PIN, GPIO_DISCONNECTED);
+    gpio_pin_configure(gpio0_dev, I2C0_SDA_PIN, GPIO_DISCONNECTED);
+
+    LOG_INF("BOOT: I2C recovery complete");
+}
 
 
 
