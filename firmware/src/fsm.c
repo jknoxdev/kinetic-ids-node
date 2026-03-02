@@ -57,10 +57,16 @@ static void state_cooldown_handle(const lima_event_t *evt);
 static void state_fault_handle(const lima_event_t *evt);
 static void state_low_battery_handle(const lima_event_t *evt);
 
-/* ── State Names for Function Calls ────────────────────────────────── */
+/* HAL stubs — real implementations declared in main.c via fsm.h */
+/* These are the internal C wrappers around the hw_* functions in main.c.
+   NOTE: hw_* functions must be wired to the
+   fsm_hw_* trampolines below, or promoted to non-static + declared here. */
 
-const char* fsm_state_to_str(lima_state_t state) {
-    static const char* names[] = {
+/* ── State Name Table ────────────────────────────────────────────────────── */
+
+const char *fsm_state_to_str(lima_state_t state)
+{
+    static const char *names[STATE_COUNT] = {
         [STATE_BOOT]           = "BOOT",
         [STATE_CALIBRATING]    = "CALIBRATING",
         [STATE_ARMED]          = "ARMED",
@@ -71,52 +77,18 @@ const char* fsm_state_to_str(lima_state_t state) {
         [STATE_TRANSMITTING]   = "TRANSMITTING",
         [STATE_COOLDOWN]       = "COOLDOWN",
         [STATE_FAULT]          = "FAULT",
-        [STATE_LOW_BATTERY]    = "LOW_BATTERY"
+        [STATE_LOW_BATTERY]    = "LOW_BATTERY",
     };
 
-    if (state >= STATE_COUNT) return "UNKNOWN";
+    if (state >= STATE_COUNT) {
+        return "UNKNOWN";
+    }
     return names[state];
 }
 
 
 
-/* ── State handlers ──────────────────────────────────────────────────────── */
 
-/*
- * STATE_BOOT
- * Init hardware, arm watchdog, load config.
- * On success -> CALIBRATING. On failure -> FAULT.
- */
-// static void state_boot_enter(void)
-// {
-//     LOG_INF("BOOT: initializing hardware");
-
-//     /* White = R + G + B */
-//     gpio_pin_set_dt(&led_r, 1);
-//     gpio_pin_set_dt(&led_g, 1);
-//     gpio_pin_set_dt(&led_b, 1);
-
-//     k_work_init_delayable(&cooldown_work, cooldown_expiry_cb);
-
-//     k_msleep(100);
-
-//     if (hw_init_sensors() != 0) {
-//         LOG_ERR("BOOT: hardware init failed -> FAULT");
-//         transition(STATE_FAULT);
-//         return;
-//     }
-//     // led_blink(1);
-//     LOG_INF("BOOT: init complete -> CALIBRATING");
-//     k_msleep(50);   // let USB flush the log
-//     transition(STATE_CALIBRATING);
-//     LOG_INF("BOOT: transition called");  // ← does this print?
-// }
-
-/*
- * STATE_CALIBRATING
- * Warm up sensors, establish baseline.
- * On success -> ARMED. On I2C error -> FAULT.
- */
 static void state_calibrating_enter(void)
 {
     LOG_INF("CALIBRATING: enter function reached");  // ← add this
