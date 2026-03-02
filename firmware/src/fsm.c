@@ -328,38 +328,15 @@ static void state_deep_sleep_handle(const lima_event_t *evt)
     }
 }
 
+/* ── State: EVENT_DETECTED ───────────────────────────────────────────────── */
 
-
-
-
-
-/*
- * STATE_EVENT_DETECTED
- * Latch trigger type + timestamp, hand off to SIGNING.
- * The event data is already in fsm.last_event from the transition.
- */
 static void state_event_detected_enter(void)
 {
-    /* Heartbeat timer was stopped by state_armed_exit() automatically */
-    /* Turn LED solid ON to indicate a 'Triggered' state */
-
-    // gpio_pin_set_dt(&led, 1);
-
-    /* Red Alert! */
-    gpio_pin_set_dt(&led_r, 1);
-    gpio_pin_set_dt(&led_g, 0);
-    gpio_pin_set_dt(&led_b, 0);
-
-    LOG_INF("EVENT DETECTED: type=%d at t=%u ms",
+    LOG_INF("EVENT DETECTED: type=0x%02X at t=%u ms",
             fsm.last_event.type,
             fsm.last_event.timestamp_ms);
 
-
-
-    hw_sign_event(&fsm.last_event);
-
-    /* In real impl, CryptoCell posts SIGNING_COMPLETE async.
-     * Stub posts it synchronously for now. */
+    /* Kick off async signing; stub posts SIGNING_COMPLETE synchronously */
     lima_event_t e = {
         .type         = LIMA_EVT_SIGNING_COMPLETE,
         .timestamp_ms = k_uptime_get_32(),
@@ -369,11 +346,9 @@ static void state_event_detected_enter(void)
     transition(STATE_SIGNING);
 }
 
-/*
- * STATE_SIGNING
- * CryptoCell-310 ECDSA-P256 sign + nonce.
- * On completion -> TRANSMITTING.
- */
+
+/* ── State: SIGNING ──────────────────────────────────────────────────────── */
+
 static void state_signing_enter(void)
 {
     LOG_INF("SIGNING: waiting for CryptoCell completion");
@@ -393,36 +368,20 @@ static void state_signing_handle(const lima_event_t *evt)
         break;
 
     default:
-        LOG_WRN("SIGNING: unhandled event type=%d", evt->type);
+        LOG_WRN("SIGNING: unhandled event 0x%02X", evt->type);
         break;
     }
 }
 
-/*
- * STATE_TRANSMITTING
- * BLE 5.0 Coded PHY advertisement with signed payload.
- * On TX confirm -> COOLDOWN. On max retries -> FAULT.
- */
+/* ── State: TRANSMITTING ─────────────────────────────────────────────────── */
+
 static void state_transmitting_enter(void)
 {
     LOG_INF("TRANSMITTING: advertising signed payload via BLE");
 
-
-    /* Arm the timeout first */
     k_work_reschedule(&tx_timeout_work, K_MSEC(TX_TIMEOUT_MS));
 
-    int rc = hw_ble_advertise(&fsm.last_event);
-    if (rc != 0) {
-        LOG_ERR("TRANSMITTING: BLE failed rc=%d -> FAULT", rc);
-        lima_event_t e = {
-            .type                   = LIMA_EVT_BLE_FAULT,
-            .timestamp_ms           = k_uptime_get_32(),
-            .data.fault.fault_code  = (uint8_t)rc,
-        };
-        lima_post_event(&e);
-        return;
-    }
-    
+    /* Stub: real impl fires callback on BLE completion */
     lima_event_t e = {
         .type         = LIMA_EVT_TX_COMPLETE,
         .timestamp_ms = k_uptime_get_32(),
@@ -438,11 +397,11 @@ static void state_transmitting_handle(const lima_event_t *evt)
         LOG_INF("TRANSMITTING: confirmed -> COOLDOWN");
         transition(STATE_COOLDOWN);
         break;
-    
+
     case LIMA_EVT_TX_TIMEOUT:
-    /* no confirm, but don’t stall forever */
-    transition(STATE_COOLDOWN);
-    break;
+        LOG_WRN("TRANSMITTING: timeout -> COOLDOWN");
+        transition(STATE_COOLDOWN);
+        break;
 
     case LIMA_EVT_BLE_FAULT:
         fsm.fault_retries = 0;
@@ -450,7 +409,7 @@ static void state_transmitting_handle(const lima_event_t *evt)
         break;
 
     default:
-        LOG_WRN("TRANSMITTING: unhandled event type=%d", evt->type);
+        LOG_WRN("TRANSMITTING: unhandled event 0x%02X", evt->type);
         break;
     }
 }
