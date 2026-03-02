@@ -414,60 +414,48 @@ static void state_transmitting_handle(const lima_event_t *evt)
     }
 }
 
-/*
- * STATE_COOLDOWN
- * Suppress new events for configurable duration.
- * Prevents event storms (vehicle bounce, rack vibration).
- * TODO: replace k_sleep with k_work_delayable (non-blocking)
- */
+
+
+
+/* ── State: COOLDOWN ─────────────────────────────────────────────────────── */
+
 static void state_cooldown_enter(void)
 {
     uint32_t ms = fsm.cooldown_ms > 0 ? fsm.cooldown_ms : 5000;
     LOG_INF("COOLDOWN: suppressing events for %u ms", ms);
-
     k_work_reschedule(&cooldown_work, K_MSEC(ms));
-    
-    // k_sleep(K_MSEC(ms));   /* TODO: make non-blocking with k_work_delayable */
-
-
-    lima_event_t e = {
-        .type         = LIMA_EVT_COOLDOWN_EXPIRED,
-        .timestamp_ms = k_uptime_get_32(),
-    };
-    // lima_post_event(&e);
 }
 
 static void state_cooldown_handle(const lima_event_t *evt)
 {
     switch (evt->type) {
     case LIMA_EVT_COOLDOWN_EXPIRED:
-        LOG_INF("COOLDOWN: expired -> ARMED [cite: 60]");
+        LOG_INF("COOLDOWN: expired -> ARMED");
         transition(STATE_ARMED);
         break;
 
-    case LIMA_EVT_LOW_BATTERY:
     case LIMA_EVT_TAMPER_DETECTED:
-        /* 💡 ADDED: Immediate reaction to priority events  */
-        LOG_WRN("COOLDOWN: priority event detected! Aborting timer.");
+        LOG_WRN("COOLDOWN: tamper override! Aborting cooldown.");
         k_work_cancel_delayable(&cooldown_work);
-        
-        if (evt->type == LIMA_EVT_TAMPER_DETECTED) {
-            fsm.last_event = *evt;
-            transition(STATE_EVENT_DETECTED);
-        } else {
-            transition(STATE_LOW_BATTERY);
-        }
-    //     break;
-    // case LIMA_EVT_CRITICAL_BATTERY:
-    //     transition(STATE_LOW_BATTERY);
-    //     break;
+        fsm.last_event = *evt;
+        transition(STATE_EVENT_DETECTED);
+        break;
+
+    case LIMA_EVT_LOW_BATTERY:
+    case LIMA_EVT_CRITICAL_BATTERY:
+        LOG_WRN("COOLDOWN: battery event override.");
+        k_work_cancel_delayable(&cooldown_work);
+        transition(STATE_LOW_BATTERY);
+        break;
 
     default:
-        /* Suppress sensor events during cooldown -- by design */
-        LOG_DBG("COOLDOWN: suppressed event type=%d", evt->type);
+        /* Intentional: suppress sensor events during cooldown */
+        LOG_DBG("COOLDOWN: suppressed event 0x%02X", evt->type);
         break;
     }
 }
+
+
 
 /*
  * STATE_FAULT
