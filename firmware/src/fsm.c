@@ -86,9 +86,6 @@ const char *fsm_state_to_str(lima_state_t state)
     return names[state];
 }
 
-
-
-
 /* ── Transition Engine ───────────────────────────────────────────────────── */
 
 static void transition(lima_state_t next)
@@ -132,10 +129,6 @@ static void transition(lima_state_t next)
     }
 }
 
-
-
-
-
 /* ── Work Queue Callbacks ────────────────────────────────────────────────── */
 
 static void cooldown_expiry_cb(struct k_work *work)
@@ -160,9 +153,6 @@ static void tx_timeout_cb(struct k_work *work)
     lima_post_event(&e);
 }
 
-
-
-
 /* ── State: BOOT ─────────────────────────────────────────────────────────── */
 
 static void state_boot_enter(void)
@@ -178,12 +168,6 @@ static void state_boot_enter(void)
     lima_post_event(&e);
 }
 
-
-
-
-
-
-
 /* ── State: CALIBRATING ──────────────────────────────────────────────────── */
 
 static void state_calibrating_enter(void)
@@ -197,13 +181,6 @@ static void state_calibrating_enter(void)
     };
     lima_post_event(&e);
 }
-
-
-
-
-
-
-
 
 /* ── State: ARMED ────────────────────────────────────────────────────────── */
 
@@ -252,8 +229,6 @@ static void state_armed_handle(const lima_event_t *evt)
     }
 }
 
-
-
 /* ── State: LIGHT_SLEEP ──────────────────────────────────────────────────── */
 
 static void state_light_sleep_enter(void)
@@ -299,7 +274,6 @@ static void state_light_sleep_handle(const lima_event_t *evt)
         break;
     }
 }
-
 
 /* ── State: DEEP_SLEEP ───────────────────────────────────────────────────── */
 
@@ -413,9 +387,6 @@ static void state_transmitting_handle(const lima_event_t *evt)
         break;
     }
 }
-
-
-
 
 /* ── State: COOLDOWN ─────────────────────────────────────────────────────── */
 
