@@ -9,4 +9,7 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(lima_blinky)
 
 # 4. This MUST come AFTER find_package because Zephyr defines 'app'
-target_sources(app PRIVATE src/main.c)
+target_sources(app PRIVATE 
+    src/main.c
+    src/fsm.c
+)
