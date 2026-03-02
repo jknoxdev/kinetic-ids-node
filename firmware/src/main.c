@@ -111,21 +111,6 @@ static void heartbeat_expiry_fn(struct k_timer *timer_id)
 
 
 
-/* ── Message queue ───────────────────────────────────────────────────────── */
-
-K_MSGQ_DEFINE(fsm_msgq, sizeof(lima_event_t), FSM_MSGQ_DEPTH, 4);
-
-/* Change the parameter to a const pointer */
-int lima_post_event(const lima_event_t *evt) {
-    /* Send the actual data to the queue */
-    return k_msgq_put(&fsm_msgq, evt, K_NO_WAIT); 
-}
-
-
-
-
-
-
 
 
 
