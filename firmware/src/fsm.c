@@ -1,6 +1,13 @@
+/*
+ * L.I.M.A. — Local Integrity Multi-modal Architecture
+ * fsm.c — State machine logic
+ *
+ * This file owns all state transition logic. It communicates with
+ * hardware exclusively through the fsm_hw_* hooks implemented in main.c.
+ * It posts events back to the queue via lima_post_event() declared in fsm.h.
+ */
+
 #include <zephyr/logging/log.h>
-#include <zephyr/drivers/gpio.h>
-#include <zephyr/drivers/sensor.h>
 #include "fsm.h"
 
 /* ── led definitions ───────────────────────────────────────────────────── */
