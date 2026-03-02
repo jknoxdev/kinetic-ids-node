@@ -504,21 +504,11 @@ static void state_fault_handle(const lima_event_t *evt)
     }
 }
 
+/* ── State: LOW_BATTERY ──────────────────────────────────────────────────── */
 
-
-
-
-/*
- * STATE_LOW_BATTERY
- * Reduce poll rate, notify gateway, stay alert.
- * Restored -> ARMED. Critical -> shutdown.
- */
 static void state_low_battery_enter(void)
 {
     LOG_WRN("LOW BATTERY: reducing poll rate, notifying gateway");
-    hw_notify_low_battery();
-    /* TODO: reduce poll frequency */
-    /* TODO: disable deep sleep cycling */
 }
 
 static void state_low_battery_handle(const lima_event_t *evt)
@@ -538,16 +528,19 @@ static void state_low_battery_handle(const lima_event_t *evt)
     case LIMA_EVT_MOTION_DETECTED:
     case LIMA_EVT_DUAL_BREACH:
     case LIMA_EVT_TAMPER_DETECTED:
-        /* Still detect and report events even on low battery */
         fsm.last_event = *evt;
         transition(STATE_EVENT_DETECTED);
         break;
 
     default:
-        LOG_WRN("LOW_BATTERY: unhandled event type=%d", evt->type);
+        LOG_WRN("LOW_BATTERY: unhandled event 0x%02X", evt->type);
         break;
     }
 }
+
+
+
+
 
 
 
