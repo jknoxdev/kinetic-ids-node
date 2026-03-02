@@ -257,7 +257,11 @@ void fsm_hw_enter_sleep(void)
     hw_enter_light_sleep();
 }
 
-
+void fsm_hw_enter_deep_sleep(void)
+{
+    hw_enter_deep_sleep();
+    hw_ble_stop();
+}
 
 
 
@@ -325,15 +329,8 @@ K_THREAD_DEFINE(sensor_thread, SENSOR_STACK_SIZE,
 /* ── FSM Hardware Stubs ────────────────────────────────────────────────── */
 /* These will be filled in once the o-scope arrives! */
 
-void fsm_hw_enter_sleep(void) {
-    LOG_INF("HAL: Entering Light Sleep (System ON)");
-    // k_cpu_idle(); 
-}
 
-void fsm_hw_enter_deep_sleep(void) {
-    LOG_INF("HAL: Entering Deep Sleep (System OFF)");
-    // sys_power_state_set();
-}
+
 
 /**
  * @brief Physical hardware response to state changes.
