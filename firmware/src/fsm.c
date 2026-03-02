@@ -10,13 +10,13 @@
 #include <zephyr/logging/log.h>
 #include "fsm.h"
 
-/* ── led definitions ───────────────────────────────────────────────────── */
-
-#define LED_R_NODE DT_ALIAS(led0)
-#define LED_G_NODE DT_ALIAS(led1)
-#define LED_B_NODE DT_ALIAS(led2)
-
 LOG_MODULE_REGISTER(lima_fsm, LOG_LEVEL_INF);
+
+/* ── FSM Context (single instance) ──────────────────────────────────────── */
+lima_fsm_ctx_t fsm = {
+    .cooldown_ms   = 5000,
+    .fault_retries = 0,
+};
 
 /* ── Internal State (Private to this file) ──────────────────────────────── */
 static lima_state_t current_state = STATE_BOOT;
