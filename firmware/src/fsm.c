@@ -88,6 +88,32 @@ const char *fsm_state_to_str(lima_state_t state)
 
 
 
+/* ── Work Queue Callbacks ────────────────────────────────────────────────── */
+
+static void cooldown_expiry_cb(struct k_work *work)
+{
+    ARG_UNUSED(work);
+    lima_event_t e = {
+        .type         = LIMA_EVT_COOLDOWN_EXPIRED,
+        .timestamp_ms = k_uptime_get_32(),
+    };
+    LOG_INF("COOLDOWN: timer expired");
+    lima_post_event(&e);
+}
+
+static void tx_timeout_cb(struct k_work *work)
+{
+    ARG_UNUSED(work);
+    lima_event_t e = {
+        .type         = LIMA_EVT_TX_TIMEOUT,
+        .timestamp_ms = k_uptime_get_32(),
+    };
+    LOG_WRN("TRANSMITTING: timeout -> forcing COOLDOWN");
+    lima_post_event(&e);
+}
+
+
+
 /* ── Transition Engine ───────────────────────────────────────────────────── */
 
 static void transition(lima_state_t next)
@@ -130,6 +156,10 @@ static void transition(lima_state_t next)
     default:                                                 break;
     }
 }
+
+
+
+
 
 
 static void state_calibrating_enter(void)
