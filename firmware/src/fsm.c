@@ -88,6 +88,49 @@ const char *fsm_state_to_str(lima_state_t state)
 
 
 
+/* ── Transition Engine ───────────────────────────────────────────────────── */
+
+static void transition(lima_state_t next)
+{
+    LOG_INF("FSM: %s -> %s",
+            fsm_state_to_str(current_state),
+            fsm_state_to_str(next));
+
+    /* EXIT actions for the current state */
+    switch (current_state) {
+    case STATE_ARMED:
+        state_armed_exit();
+        break;
+    case STATE_COOLDOWN:
+        k_work_cancel_delayable(&cooldown_work);
+        break;
+    case STATE_TRANSMITTING:
+        k_work_cancel_delayable(&tx_timeout_work);
+        break;
+    default:
+        break;
+    }
+
+    current_state = next;
+    fsm_hw_set_led(current_state);
+
+    /* ENTRY actions for the new state */
+    switch (current_state) {
+    case STATE_BOOT:           state_boot_enter();           break;
+    case STATE_CALIBRATING:    state_calibrating_enter();    break;
+    case STATE_ARMED:          state_armed_enter();          break;
+    case STATE_LIGHT_SLEEP:    state_light_sleep_enter();    break;
+    case STATE_DEEP_SLEEP:     state_deep_sleep_enter();     break;
+    case STATE_EVENT_DETECTED: state_event_detected_enter(); break;
+    case STATE_SIGNING:        state_signing_enter();        break;
+    case STATE_TRANSMITTING:   state_transmitting_enter();   break;
+    case STATE_COOLDOWN:       state_cooldown_enter();       break;
+    case STATE_FAULT:          state_fault_enter();          break;
+    case STATE_LOW_BATTERY:    state_low_battery_enter();    break;
+    default:                                                 break;
+    }
+}
+
 
 static void state_calibrating_enter(void)
 {
@@ -601,52 +644,5 @@ void fsm_init(void) {
  */
 lima_state_t fsm_get_state(void) {
     return current_state;
-}
-
-
-
-
-/* ── Transition Function ────────────────────────────────── */
-
-
-static void transition(lima_state_t next)
-{
-    LOG_INF("FSM: %s -> %s", fsm_state_to_str(current_state), fsm_state_to_str(next));
-
-    /* 1. EXIT ACTIONS (Cleanup old state) */
-    switch (current_state) {
-        case STATE_ARMED:
-            /* Tell main.c to stop the heartbeat timer */
-            fsm_hw_set_led(STATE_BOOT); // Resets LEDs
-            break;
-        case STATE_COOLDOWN:
-            /* Stop the cooldown work if we leave early (e.g., Tamper) */
-            // k_work_cancel_delayable(&cooldown_work); // Need to move/bridge this work item too
-            break;
-        default:
-            break;
-    }
-
-    /* 2. UPDATE STATE */
-    current_state = next;
-
-    /* 3. ENTRY ACTIONS (Setup new state) */
-    /* We call the LED helper here so the hardware responds immediately */
-    fsm_hw_set_led(current_state);
-
-    switch (current_state) {
-        case STATE_BOOT:
-            state_boot_enter();
-            break;
-        case STATE_ARMED:
-            state_armed_enter();
-            break;
-        case STATE_CALIBRATING:
-            // state_calibrating_enter(); // Add your forward declaration for this
-            break;
-        // Add others as you build them out
-        default:
-            break;
-    }
 }
 
