@@ -2,7 +2,7 @@
 
 ## Overview
 
-LIMA (Local Integrity Multi-modal Architecture) is an open-source Physical Intrusion Detection System designed for OT/ICS environments. Security is central to the project's mission. Responsible disclosure of vulnerabilities is welcomed and appreciated.
+LIMA (Local Integrity Multi-modal Architecture) is an open-source Physical Intrusion Detection System. Security is central to the project's mission. Responsible disclosure of vulnerabilities is welcomed and appreciated.
 
 ---
 
