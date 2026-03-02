@@ -250,40 +250,6 @@ static void hw_notify_low_battery(void)
 }
 
 
-static void hw_i2c_bus_recovery(void)
-{
-    LOG_INF("BOOT: Performing I2C bus recovery on P0.19/P0.20...");
-
-    /* Get the device pointer for GPIO Port 0 */
-    const struct device *gpio0_dev = DEVICE_DT_GET(DT_NODELABEL(gpio0));
-
-    if (!device_is_ready(gpio0_dev)) {
-        LOG_ERR("GPIO0 device not ready for recovery");
-        return;
-    }
-
-    /* Configure SCL as output, SDA as input */
-    gpio_pin_configure(gpio0_dev, I2C0_SCL_PIN, GPIO_OUTPUT_HIGH);
-    gpio_pin_configure(gpio0_dev, I2C0_SDA_PIN, GPIO_INPUT);
-
-    /* Clock out 9 pulses to release SDA */
-    for (int i = 0; i < 9; i++) {
-        gpio_pin_set_raw(gpio0_dev, I2C0_SCL_PIN, 1);
-        k_busy_wait(5);
-        gpio_pin_set_raw(gpio0_dev, I2C0_SCL_PIN, 0);
-        k_busy_wait(5);
-    }
-    
-    /* Leave SCL high (idle state) */
-    gpio_pin_set_raw(gpio0_dev, I2C0_SCL_PIN, 1);
-    
-    /* 💡 CRITICAL: We must "unconfigure" the pins so the I2C driver 
-       can take control of them again when it initializes later. */
-    gpio_pin_configure(gpio0_dev, I2C0_SCL_PIN, GPIO_DISCONNECTED);
-    gpio_pin_configure(gpio0_dev, I2C0_SDA_PIN, GPIO_DISCONNECTED);
-
-    LOG_INF("BOOT: I2C recovery complete");
-}
 
 
 
