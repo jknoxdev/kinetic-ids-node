@@ -23,31 +23,43 @@ typedef enum {
     LIMA_EVT_PRESSURE_BREACH    = 0x01,  /* BMP280: pressure delta > threshold  */
     LIMA_EVT_MOTION_DETECTED    = 0x02,  /* MPU6050: acceleration > threshold   */
     LIMA_EVT_DUAL_BREACH        = 0x03,  /* Both sensors triggered              */
+    LIMA_EVT_SENSOR_TRIGGER     = 0x04,  /* General/Generic sensor trigger      */
+    LIMA_EVT_TAMPER_DETECTED    = 0x05,  /* Case open / voltage spike           */
+    LIMA_EVT_WAKEUP             = 0x06,  /* General wakeup (RTC or GPIO)        */
+    LIMA_EVT_RTC_WAKEUP         = 0x07,  /* RTC only woke from deep sleep       */
 
-    /* Node health */
-    LIMA_EVT_TAMPER_DETECTED    = 0x04,  /* Case open / voltage spike           */
-    LIMA_EVT_LOW_BATTERY        = 0x05,  /* Vbat < low threshold                */
-    LIMA_EVT_CRITICAL_BATTERY   = 0x06,  /* Vbat < critical threshold → shutdown*/
-    LIMA_EVT_BATTERY_RESTORED   = 0x07,  /* Vbat recovered                      */
+    /* ── Node Health & Battery (0x08 - 0x0F) ─────────────────────────────── */
+    LIMA_EVT_LOW_BATTERY        = 0x08,  /* Vbat < low threshold                */
+    LIMA_EVT_CRITICAL_BATTERY   = 0x09,  /* Vbat < critical threshold -> shutdown*/
+    LIMA_EVT_BATTERY_RESTORED   = 0x0A,  /* Vbat recovered                      */
+    LIMA_EVT_INIT_COMPLETED     = 0x0B,  /* Node init completed                 */
 
-    /* Sensor / hardware faults */
-    LIMA_EVT_SENSOR_FAULT       = 0x08,  /* I2C error / sensor dropout          */
-    LIMA_EVT_BLE_FAULT          = 0x09,  /* BLE TX failed (max retries)         */
-    LIMA_EVT_RECOVERY_SUCCESS   = 0x0A,  /* Fault recovery succeeded            */
-    LIMA_EVT_RECOVERY_FAILED    = 0x0B,  /* Unrecoverable → watchdog reset      */
 
-    /* Lifecycle / timing */
+    /* ── Lifecycle & Timing (0x10 - 0x1F) ────────────────────────────────── */
     LIMA_EVT_INIT_COMPLETE      = 0x10,  /* Boot init done, watchdog armed      */
     LIMA_EVT_BASELINE_READY     = 0x11,  /* Calibration complete                */
     LIMA_EVT_POLL_TICK          = 0x12,  /* Poll interval elapsed (no event)    */
-    LIMA_EVT_SLEEP_TIMER_EXPIRY = 0x13,  /* Inactivity → deep sleep             */
-    LIMA_EVT_RTC_WAKEUP         = 0x14,  /* RTC woke from deep sleep            */
-    LIMA_EVT_COOLDOWN_EXPIRED   = 0x15,  /* Cooldown timer done → rearm         */
-    LIMA_EVT_TX_COMPLETE        = 0x16,  /* BLE advertisement confirmed         */
-    LIMA_EVT_SIGNING_COMPLETE   = 0x17,  /* Payload signed and ready            */
-    LIMA_EVT_TX_TIMEOUT         = 0x18,  /* TX did not confirm in time          */
+    LIMA_EVT_GOTO_SLEEP         = 0x13,  /* Manual trigger for Light Sleep      */
+    LIMA_EVT_GOTO_DEEP_SLEEP    = 0x14,  /* Manual trigger for System OFF       */
+    LIMA_EVT_SLEEP_TIMER_EXPIRY = 0x15,  /* Inactivity -> deep sleep            */
+    LIMA_EVT_COOLDOWN_EXPIRED   = 0x16,  /* Cooldown timer done -> rearm        */
+    LIMA_EVT_TIMEOUT            = 0x17,  /* General purpose FSM timeout         */
+
+    /* ── BLE Broker & Signing (0x20 - 0x2F) ──────────────────────────────── */
+    LIMA_EVT_SIGNING_COMPLETE   = 0x20,  /* Payload signed and ready            */
+    LIMA_EVT_TX_COMPLETE        = 0x21,  /* BLE advertisement confirmed         */
+    LIMA_EVT_TX_TIMEOUT         = 0x22,  /* TX did not confirm in time          */
+    LIMA_EVT_TX_FAILED          = 0x23,  /* Advertisement failed (max retries)  */
+
+    /* ── Faults & Recovery (0x30 - 0x3F) ─────────────────────────────────── */
+    LIMA_EVT_SENSOR_FAULT       = 0x30,  /* I2C error / sensor dropout          */
+    LIMA_EVT_BLE_FAULT          = 0x31,  /* BLE TX failed (max retries)         */
+    LIMA_EVT_RECOVERY_SUCCESS   = 0x32,  /* Fault recovery succeeded            */
+    LIMA_EVT_RECOVERY_FAILED    = 0x33,  /* Unrecoverable -> watchdog reset     */
+    LIMA_EVT_ERROR              = 0x3F   /* General system logic error          */
 
 } lima_event_type_t;
+
 
 /* ── Sensor payload variants ─────────────────────────────────────────────── */
 
