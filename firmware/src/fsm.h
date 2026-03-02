@@ -17,8 +17,8 @@ typedef enum {
     STATE_TRANSMITTING,
     STATE_COOLDOWN,
     STATE_FAULT,
-    STATE_COUNT,
-    STATE_LOW_BATTERY
+    STATE_LOW_BATTERY,
+    STATE_COUNT
 } lima_state_t;
 
 /* ── FSM Context ─────────────────────────────────────────────────────────── */
