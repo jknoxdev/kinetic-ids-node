@@ -76,45 +76,38 @@ int lima_post_event(const lima_event_t *evt)
 
 
 
-
 /* Non-blocking timer for cooldown */
 static struct k_work_delayable cooldown_work; 
 
 /* Non-blocking timer tx timeout */
 static struct k_work_delayable tx_timeout_work;
 
+
+
 /* Threads */
 static void sensor_thread_fn(void *p1, void *p2, void *p3);
 static void fsm_thread_fn(void *p1, void *p2, void *p3);
 
-/* ── Timing and LEDS  ─────────────────────────────────────────────────── */
 
-/* Timer to blink LED in ARMED state */
-void heartbeat_expiry_fn(struct k_timer *timer_id);
+
+/* ── Heartbeat timer (ARMED state blue pulse) ────────────────────────────── */
+
+static void heartbeat_expiry_fn(struct k_timer *timer_id);
 K_TIMER_DEFINE(heartbeat_timer, heartbeat_expiry_fn, NULL);
 
-void heartbeat_expiry_fn(struct k_timer *timer_id)
+static void heartbeat_expiry_fn(struct k_timer *timer_id)
 {
+    ARG_UNUSED(timer_id);
     static uint8_t tick = 0;
-    bool led_on = false;
 
-    /* Pattern definition (Total 20 ticks = 2 seconds) 
-     * Tick 0: ON,  Tick 1: OFF
-     * Tick 2: ON,  Tick 3: OFF
-     * Ticks 4-19: OFF (The 'wait' period)
-     */
-    if (tick == 0 || tick == 2) {
-        led_on = true;
-    } else {
-        led_on = false;
-    }
-
+    /* Double-blink pattern: on at tick 0 and 2, off otherwise.
+     * Period = 20 ticks × 100 ms = 2 seconds. */
+    bool led_on = (tick == 0 || tick == 2);
     gpio_pin_set_dt(&led_b, led_on ? 1 : 0);
-
-    /* Increment and wrap every 20 ticks (20 * 100ms = 2 seconds) */
     tick = (tick + 1) % 20;
-
 }
+
+
 
 static void tx_timeout_cb(struct k_work *work)
 {
