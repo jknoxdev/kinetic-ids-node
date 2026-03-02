@@ -205,48 +205,31 @@ static void state_calibrating_enter(void)
 
 
 
+/* ── State: ARMED ────────────────────────────────────────────────────────── */
 
-/*
- * STATE_ARMED
- * Active monitoring state.
- * Sensor thread handles the actual polling and posts events here.
- * Either sensor alone is sufficient to trigger EVENT_DETECTED.
- */
-// static void state_armed_enter(void)
-// {    
-//     // led_blink(3);
-//     LOG_INF("ARMED: Sensors active. Heartbeat started.");
-//     gpio_pin_set_dt(&led_r, 0);
-//     gpio_pin_set_dt(&led_g, 0);
-
-//     // /* Blink every 2 seconds (100ms on, then stays off until next cycle) */
-//     // k_timer_start(&heartbeat_timer, K_MSEC(2000), K_MSEC(2000));
-//     /* Timer now runs every 100ms to handle the rapid pulse pattern */
-//     k_timer_start(&heartbeat_timer, K_MSEC(100), K_MSEC(100));
-
-//     fsm.armed_since_ms = k_uptime_get_32();
-//     hw_enable_irqs();
-// }
+static void state_armed_enter(void)
+{
+    LOG_INF("ARMED: sensors active, heartbeat started");
+    fsm.armed_since_ms = k_uptime_get_32();
+    /* LED heartbeat is started by fsm_hw_set_led(STATE_ARMED) in main.c */
+}
 
 static void state_armed_exit(void)
 {
-    k_timer_stop(&heartbeat_timer);
-    // gpio_pin_set_dt(&led, 0); // Ensure LED is off when leaving ARMED
-    gpio_pin_set_dt(&led_r, 0);
-    gpio_pin_set_dt(&led_g, 0);
-    gpio_pin_set_dt(&led_b, 0);
-    LOG_DBG("ARMED: Heartbeat stopped.");
+    LOG_DBG("ARMED: exit — heartbeat stopped");
+    /* Heartbeat stop is handled by fsm_hw_set_led() for the next state,
+       but we call into main.c's hook explicitly to be safe. */
+    fsm_hw_enter_sleep(); /* no-op unless overridden */
 }
 
-
-static void state_armed_handle(const lima_event_t *evt) {
+static void state_armed_handle(const lima_event_t *evt) 
+{
     switch (evt->type) {
         case LIMA_EVT_PRESSURE_BREACH:
         case LIMA_EVT_MOTION_DETECTED:
         case LIMA_EVT_DUAL_BREACH:
         case LIMA_EVT_TAMPER_DETECTED:
-            /* We don't need to copy to fsm.last_event anymore because 
-               the event is passed into the next state if needed */
+            fsm.last_event = *evt;
             transition(STATE_EVENT_DETECTED);
             break;
 
@@ -268,6 +251,9 @@ static void state_armed_handle(const lima_event_t *evt) {
             break;
     }
 }
+
+
+
 
 /*
  * STATE_LIGHT_SLEEP
