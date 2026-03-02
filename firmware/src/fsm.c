@@ -1,5 +1,13 @@
 #include <zephyr/logging/log.h>
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/sensor.h>
 #include "fsm.h"
+
+/* ── led definitions ───────────────────────────────────────────────────── */
+
+#define LED_R_NODE DT_ALIAS(led0)
+#define LED_G_NODE DT_ALIAS(led1)
+#define LED_B_NODE DT_ALIAS(led2)
 
 LOG_MODULE_REGISTER(lima_fsm, LOG_LEVEL_INF);
 
@@ -27,12 +35,9 @@ static void cooldown_expiry_cb(struct k_work *work);
 static void heartbeat_expiry_fn(struct k_timer *timer_id);
 
 /* State entry/exit/handlers */
-static void state_boot_enter(void);
 static void state_calibrating_enter(void);
 
-static void state_armed_enter(void);
 static void state_armed_exit(void);
-static void state_armed_handle(const lima_event_t *evt);
 
 static void state_light_sleep_enter(void);
 static void state_light_sleep_handle(const lima_event_t *evt);
@@ -81,7 +86,6 @@ const char* fsm_state_to_str(lima_state_t state) {
 
 
 
-
 /* ── State handlers ──────────────────────────────────────────────────────── */
 
 /*
@@ -89,30 +93,30 @@ const char* fsm_state_to_str(lima_state_t state) {
  * Init hardware, arm watchdog, load config.
  * On success -> CALIBRATING. On failure -> FAULT.
  */
-static void state_boot_enter(void)
-{
-    LOG_INF("BOOT: initializing hardware");
+// static void state_boot_enter(void)
+// {
+//     LOG_INF("BOOT: initializing hardware");
 
-    /* White = R + G + B */
-    gpio_pin_set_dt(&led_r, 1);
-    gpio_pin_set_dt(&led_g, 1);
-    gpio_pin_set_dt(&led_b, 1);
+//     /* White = R + G + B */
+//     gpio_pin_set_dt(&led_r, 1);
+//     gpio_pin_set_dt(&led_g, 1);
+//     gpio_pin_set_dt(&led_b, 1);
 
-    k_work_init_delayable(&cooldown_work, cooldown_expiry_cb);
+//     k_work_init_delayable(&cooldown_work, cooldown_expiry_cb);
 
-    k_msleep(100);
+//     k_msleep(100);
 
-    if (hw_init_sensors() != 0) {
-        LOG_ERR("BOOT: hardware init failed -> FAULT");
-        transition(STATE_FAULT);
-        return;
-    }
-    // led_blink(1);
-    LOG_INF("BOOT: init complete -> CALIBRATING");
-    k_msleep(50);   // let USB flush the log
-    transition(STATE_CALIBRATING);
-    LOG_INF("BOOT: transition called");  // ← does this print?
-}
+//     if (hw_init_sensors() != 0) {
+//         LOG_ERR("BOOT: hardware init failed -> FAULT");
+//         transition(STATE_FAULT);
+//         return;
+//     }
+//     // led_blink(1);
+//     LOG_INF("BOOT: init complete -> CALIBRATING");
+//     k_msleep(50);   // let USB flush the log
+//     transition(STATE_CALIBRATING);
+//     LOG_INF("BOOT: transition called");  // ← does this print?
+// }
 
 /*
  * STATE_CALIBRATING
@@ -151,21 +155,21 @@ static void state_calibrating_enter(void)
  * Sensor thread handles the actual polling and posts events here.
  * Either sensor alone is sufficient to trigger EVENT_DETECTED.
  */
-static void state_armed_enter(void)
-{    
-    // led_blink(3);
-    LOG_INF("ARMED: Sensors active. Heartbeat started.");
-    gpio_pin_set_dt(&led_r, 0);
-    gpio_pin_set_dt(&led_g, 0);
+// static void state_armed_enter(void)
+// {    
+//     // led_blink(3);
+//     LOG_INF("ARMED: Sensors active. Heartbeat started.");
+//     gpio_pin_set_dt(&led_r, 0);
+//     gpio_pin_set_dt(&led_g, 0);
 
-    // /* Blink every 2 seconds (100ms on, then stays off until next cycle) */
-    // k_timer_start(&heartbeat_timer, K_MSEC(2000), K_MSEC(2000));
-    /* Timer now runs every 100ms to handle the rapid pulse pattern */
-    k_timer_start(&heartbeat_timer, K_MSEC(100), K_MSEC(100));
+//     // /* Blink every 2 seconds (100ms on, then stays off until next cycle) */
+//     // k_timer_start(&heartbeat_timer, K_MSEC(2000), K_MSEC(2000));
+//     /* Timer now runs every 100ms to handle the rapid pulse pattern */
+//     k_timer_start(&heartbeat_timer, K_MSEC(100), K_MSEC(100));
 
-    fsm.armed_since_ms = k_uptime_get_32();
-    hw_enable_irqs();
-}
+//     fsm.armed_since_ms = k_uptime_get_32();
+//     hw_enable_irqs();
+// }
 
 static void state_armed_exit(void)
 {
@@ -177,38 +181,34 @@ static void state_armed_exit(void)
     LOG_DBG("ARMED: Heartbeat stopped.");
 }
 
-static void state_armed_handle(const lima_event_t *evt)
-{
-    // led_blink(3);
+
+static void state_armed_handle(const lima_event_t *evt) {
     switch (evt->type) {
-    case LIMA_EVT_PRESSURE_BREACH:
-    case LIMA_EVT_MOTION_DETECTED:
-    case LIMA_EVT_DUAL_BREACH:
-    case LIMA_EVT_TAMPER_DETECTED:
-        fsm.last_event = *evt;      /* copy event data before transitioning */
-        transition(STATE_EVENT_DETECTED);
-        break;
+        case LIMA_EVT_PRESSURE_BREACH:
+        case LIMA_EVT_MOTION_DETECTED:
+        case LIMA_EVT_DUAL_BREACH:
+        case LIMA_EVT_TAMPER_DETECTED:
+            /* We don't need to copy to fsm.last_event anymore because 
+               the event is passed into the next state if needed */
+            transition(STATE_EVENT_DETECTED);
+            break;
 
-    case LIMA_EVT_POLL_TICK:
-        transition(STATE_LIGHT_SLEEP);
-        break;
+        case LIMA_EVT_POLL_TICK:
+            transition(STATE_LIGHT_SLEEP);
+            break;
 
-    case LIMA_EVT_LOW_BATTERY:
-    case LIMA_EVT_CRITICAL_BATTERY:
-        transition(STATE_LOW_BATTERY);
-        break;
+        case LIMA_EVT_LOW_BATTERY:
+        case LIMA_EVT_CRITICAL_BATTERY:
+            transition(STATE_LOW_BATTERY);
+            break;
 
-    case LIMA_EVT_SENSOR_FAULT:
-        fsm.fault_retries = 0;
-        transition(STATE_FAULT);
-        break;
-    case LIMA_EVT_INIT_COMPLETE:
-    /* Ignore - already initialized */
-    break;
+        case LIMA_EVT_SENSOR_FAULT:
+            transition(STATE_FAULT);
+            break;
 
-    default:
-        LOG_WRN("ARMED: unhandled event type=%d", evt->type);
-        break;
+        default:
+            LOG_WRN("ARMED: unhandled event type=0x%02X", evt->type);
+            break;
     }
 }
 
@@ -593,6 +593,7 @@ static void state_low_battery_handle(const lima_event_t *evt)
 }
 
 /* ── Implementation of Internal Handlers ────────────────────────────────── */
+
 static void state_boot_enter(void) {
     LOG_INF("FSM: Entering BOOT");
     fsm_hw_set_led(STATE_BOOT);
@@ -603,11 +604,11 @@ static void state_armed_enter(void) {
     fsm_hw_set_led(STATE_ARMED);
 }
 
-static void state_armed_handle(const lima_event_t *evt) {
-    if (evt->type == LIMA_EVT_SENSOR_TRIGGER) {
-        current_state = STATE_SIGNING; 
-    }
-}
+// static void state_armed_handle(const lima_event_t *evt) {
+//     if (evt->type == LIMA_EVT_SENSOR_TRIGGER) {
+//         current_state = STATE_SIGNING; 
+//     }
+// }
 
 
 /**
@@ -627,10 +628,59 @@ void fsm_init(void) {
 }
 
 
+
+
 /**
  * @brief Thread-safe getter for the current FSM state
  */
 lima_state_t fsm_get_state(void) {
     return current_state;
+}
+
+
+
+
+/* ── Transition Function ────────────────────────────────── */
+
+
+static void transition(lima_state_t next)
+{
+    LOG_INF("FSM: %s -> %s", fsm_state_to_str(current_state), fsm_state_to_str(next));
+
+    /* 1. EXIT ACTIONS (Cleanup old state) */
+    switch (current_state) {
+        case STATE_ARMED:
+            /* Tell main.c to stop the heartbeat timer */
+            fsm_hw_set_led(STATE_BOOT); // Resets LEDs
+            break;
+        case STATE_COOLDOWN:
+            /* Stop the cooldown work if we leave early (e.g., Tamper) */
+            // k_work_cancel_delayable(&cooldown_work); // Need to move/bridge this work item too
+            break;
+        default:
+            break;
+    }
+
+    /* 2. UPDATE STATE */
+    current_state = next;
+
+    /* 3. ENTRY ACTIONS (Setup new state) */
+    /* We call the LED helper here so the hardware responds immediately */
+    fsm_hw_set_led(current_state);
+
+    switch (current_state) {
+        case STATE_BOOT:
+            state_boot_enter();
+            break;
+        case STATE_ARMED:
+            state_armed_enter();
+            break;
+        case STATE_CALIBRATING:
+            // state_calibrating_enter(); // Add your forward declaration for this
+            break;
+        // Add others as you build them out
+        default:
+            break;
+    }
 }
 

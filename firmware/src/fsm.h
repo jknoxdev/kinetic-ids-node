@@ -21,32 +21,14 @@ typedef enum {
     STATE_LOW_BATTERY
 } lima_state_t;
 
-
-/* fsm.h */
-
-
-
-// moved to events.h
-
-// /* ── Event Definitions ───────────────────────────────────────────────────── */
-// typedef enum {
-//     LIMA_EVT_INIT_COMPLETED,
-//     LIMA_EVT_SENSOR_TRIGGER,
-//     LIMA_EVT_SIGNING_DONE,
-//     LIMA_EVT_TX_COMPLETE,
-//     LIMA_EVT_TX_FAILED,
-//     LIMA_EVT_GOTO_SLEEP,      /* Trigger for Light Sleep */
-//     LIMA_EVT_GOTO_DEEP_SLEEP, /* Trigger for System OFF */
-//     LIMA_EVT_WAKEUP,
-//     LIMA_EVT_TIMEOUT,
-//     LIMA_EVT_ERROR
-
-// } lima_event_type_t;
-
+/* ── FSM Context ─────────────────────────────────────────────────────────── */
+/* Holds all mutable FSM state. Defined in fsm.c, declared extern here. */
 typedef struct {
-    lima_event_type_t type;
-    uint32_t timestamp;
-} fsm_event_msg_t;
+    lima_event_t    last_event;         /* Latched trigger event */
+    uint32_t        armed_since_ms;     /* k_uptime when we entered ARMED */
+    uint32_t        cooldown_ms;        /* Configurable cooldown duration */
+    uint8_t         fault_retries;      /* Retry counter for FAULT recovery */
+} lima_fsm_ctx_t;
 
 
 /* ── FSM Logic API ───────────────────────────────────────────────────────── */
@@ -55,6 +37,10 @@ void fsm_init(void);
 void fsm_dispatch(const lima_event_t *evt); 
 lima_state_t fsm_get_state(void);
 const char* fsm_state_to_str(lima_state_t state);
+
+/* ── Event Queue API (defined in main.c) ────────────────────────────────── */
+/* fsm.c calls this to post events back to the queue during transitions */
+int lima_post_event(const lima_event_t *evt);
 
 
 /* ── Hardware Abstraction Hooks (The "Stubs" for main.c) ────────────────── */
@@ -75,7 +61,5 @@ void fsm_hw_enter_deep_sleep(void);
  * @brief Updates physical LEDs based on the FSM state.
  */
 void fsm_hw_set_led(lima_state_t state);
-
-const char* fsm_state_to_str(lima_state_t state);
 
 #endif /* LIMA_FSM_H */
