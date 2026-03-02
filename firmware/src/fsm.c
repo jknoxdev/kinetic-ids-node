@@ -542,6 +542,35 @@ static void state_low_battery_handle(const lima_event_t *evt)
 
 
 
+/* ── Public API ──────────────────────────────────────────────────────────── */
+
+
+/**
+ * @brief Initializes the FSM to the starting state.
+ */
+void fsm_init(void) {
+    LOG_INF("FSM: Initializing...");
+
+    /* Start at the very beginning */
+    current_state = STATE_BOOT;
+
+    /* Optional: Trigger any specific startup hardware logic here, 
+       like turning on a 'System Booting' LED */
+    fsm_hw_set_led(STATE_BOOT);
+
+    LOG_INF("FSM: Entered %s", fsm_state_to_str(current_state));
+}
+
+
+
+
+
+/**
+ * @brief Thread-safe getter for the current FSM state
+ */
+lima_state_t fsm_get_state(void) {
+    return current_state;
+}
 
 
 
@@ -574,41 +603,5 @@ static void state_low_battery_handle(const lima_event_t *evt)
 /* ── Implementation of Internal Handlers ────────────────────────────────── */
 
 
-static void state_armed_enter(void) {
-    LOG_INF("FSM: System ARMED");
-    fsm_hw_set_led(STATE_ARMED);
-}
 
-// static void state_armed_handle(const lima_event_t *evt) {
-//     if (evt->type == LIMA_EVT_SENSOR_TRIGGER) {
-//         current_state = STATE_SIGNING; 
-//     }
-// }
-
-
-/**
- * @brief Initializes the FSM to the starting state.
- */
-void fsm_init(void) {
-    LOG_INF("FSM: Initializing...");
-
-    /* Start at the very beginning */
-    current_state = STATE_BOOT;
-
-    /* Optional: Trigger any specific startup hardware logic here, 
-       like turning on a 'System Booting' LED */
-    fsm_hw_set_led(STATE_BOOT);
-
-    LOG_INF("FSM: Entered %s", fsm_state_to_str(current_state));
-}
-
-
-
-
-/**
- * @brief Thread-safe getter for the current FSM state
- */
-lima_state_t fsm_get_state(void) {
-    return current_state;
-}
 
