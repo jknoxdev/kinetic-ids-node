@@ -10,7 +10,7 @@
 #include <zephyr/logging/log.h>
 #include "fsm.h"
 
-LOG_MODULE_REGISTER(lima_fsm);
+LOG_MODULE_REGISTER(lima_fsm), LOG_LEVEL_DBG;
 
 /* ── FSM Context (single instance) ──────────────────────────────────────── */
 lima_fsm_ctx_t fsm = {

@@ -31,7 +31,7 @@
 #include "events.h"
 #include "fsm.h"
 
-LOG_MODULE_REGISTER(lima_main);
+LOG_MODULE_REGISTER(lima_main, LOG_LEVEL_DBG);
 
 #define I2C0_SCL_PIN 19
 #define I2C0_SDA_PIN 20
