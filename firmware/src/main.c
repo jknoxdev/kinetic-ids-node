@@ -389,39 +389,25 @@ K_THREAD_DEFINE(sensor_thread, SENSOR_STACK_SIZE,
 
 int main(void)
 {
-    // suspend threads immediately before USB chaos starts
     k_thread_suspend(fsm_thread);
     k_thread_suspend(sensor_thread);
 
-    // 2. Clear the I2C bus manually before doing ANYTHING else
-    // This prevents a hung sensor from blocking the driver later
     hw_i2c_bus_recovery();
 
-    /* Init RGB Pins */
     gpio_pin_configure_dt(&led_r, GPIO_OUTPUT_INACTIVE);
     gpio_pin_configure_dt(&led_g, GPIO_OUTPUT_INACTIVE);
     gpio_pin_configure_dt(&led_b, GPIO_OUTPUT_INACTIVE);
 
-    // /* Temporary test: Force the LED to stay on regardless of FSM */
-    // gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE); 
-    // gpio_pin_set_dt(&led, 1); // If ACTIVE_LOW is set in DTS, this should light it up.
-    
     LOG_INF("L.I.M.A. node firmware starting");
-    
-    // 3. Increase the wait and ensure USB is stable
-    // We wait 6 seconds now to be absolutely sure the host has finished enumeration
+
     for (int i = 0; i < 6; i++) {
-        // led_blink(1);
         k_msleep(1000);
-        LOG_INF("USB Settle Loop: %d/6", i+1);
+        LOG_INF("USB settle: %d/6", i + 1);
     }
-    
-    LOG_INF("Starting LIMA Threads...");
+
+    LOG_INF("Starting LIMA threads...");
     k_thread_resume(fsm_thread);
     k_thread_resume(sensor_thread);
-
-    // initialize the tx_timeout for non-BLE mode
-    k_work_init_delayable(&tx_timeout_work, tx_timeout_cb);
 
     return 0;
 }
