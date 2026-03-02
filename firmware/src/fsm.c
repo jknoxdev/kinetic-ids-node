@@ -27,53 +27,35 @@ static struct k_work_delayable tx_timeout_work;
 
 /* ── Forward Declarations ────────────────────────────────────────────────── */
 
-
-static void state_boot_enter(void);
-static void state_armed_enter(void);
-static void state_armed_handle(const lima_event_t *evt);
-
-// ... add the rest for TRANS_ENTER, etc ...
-/* ── Forward Declarations for State Handlers ────────────────────────────── */
-
-/* Event queue */
-static int lima_post_event(const lima_event_t *evt);
-
-/* FSM core */
 static void transition(lima_state_t next);
-// static void fsm_dispatch(const lima_event_t *evt);
 
-/* Work / timer callbacks */
+/* Work/timer callbacks */
 static void cooldown_expiry_cb(struct k_work *work);
-static void heartbeat_expiry_fn(struct k_timer *timer_id);
+static void tx_timeout_cb(struct k_work *work);
 
-/* State entry/exit/handlers */
+/* State entry functions */
+static void state_boot_enter(void);
 static void state_calibrating_enter(void);
-
+static void state_armed_enter(void);
 static void state_armed_exit(void);
-
 static void state_light_sleep_enter(void);
-static void state_light_sleep_handle(const lima_event_t *evt);
-
 static void state_deep_sleep_enter(void);
-static void state_deep_sleep_handle(const lima_event_t *evt);
-
 static void state_event_detected_enter(void);
-
 static void state_signing_enter(void);
-static void state_signing_handle(const lima_event_t *evt);
-
 static void state_transmitting_enter(void);
-static void state_transmitting_handle(const lima_event_t *evt);
-
 static void state_cooldown_enter(void);
-static void state_cooldown_handle(const lima_event_t *evt);
-
 static void state_fault_enter(void);
-static void state_fault_handle(const lima_event_t *evt);
-
 static void state_low_battery_enter(void);
-static void state_low_battery_handle(const lima_event_t *evt);
 
+/* State event handlers */
+static void state_armed_handle(const lima_event_t *evt);
+static void state_light_sleep_handle(const lima_event_t *evt);
+static void state_deep_sleep_handle(const lima_event_t *evt);
+static void state_signing_handle(const lima_event_t *evt);
+static void state_transmitting_handle(const lima_event_t *evt);
+static void state_cooldown_handle(const lima_event_t *evt);
+static void state_fault_handle(const lima_event_t *evt);
+static void state_low_battery_handle(const lima_event_t *evt);
 
 /* ── State Names for Function Calls ────────────────────────────────── */
 
