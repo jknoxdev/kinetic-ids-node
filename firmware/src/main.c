@@ -356,15 +356,20 @@ static void sensor_thread_fn(void *p1, void *p2, void *p3)
 
 /* ── FSM thread ──────────────────────────────────────────────────────────── */
 
+static void fsm_thread_fn(void *p1, void *p2, void *p3)
+{
+    ARG_UNUSED(p1); ARG_UNUSED(p2); ARG_UNUSED(p3);
+    LOG_INF("FSM thread started");
 
+    fsm_init();
 
-//  * Thread startup:
-//  *   Threads are defined with K_FOREVER (no auto-start).
-//  *   main() blinks LED to let USB settle, then calls:
-//  *       k_thread_start(fsm_thread);
-//  *       k_thread_start(sensor_thread);
-//  *   This prevents the USB suspend/reset cycle from
-//  *   interrupting FSM boot sequencing.
+    lima_event_t msg;
+    while (1) {
+        if (k_msgq_get(&fsm_msgq, &msg, K_FOREVER) == 0) {
+            fsm_dispatch(&msg);
+        }
+    }
+}
 
 K_THREAD_DEFINE(fsm_thread, FSM_STACK_SIZE,
                 fsm_thread_fn, NULL, NULL, NULL,
