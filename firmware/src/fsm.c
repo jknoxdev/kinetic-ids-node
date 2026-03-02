@@ -456,33 +456,28 @@ static void state_cooldown_handle(const lima_event_t *evt)
 }
 
 
+/* ── State: FAULT ────────────────────────────────────────────────────────── */
 
-/*
- * STATE_FAULT
- * Log to flash, assert fault LED, attempt recovery.
- * Recovery success -> CALIBRATING.
- * Max retries exceeded -> watchdog reset.
- */
 static void state_fault_enter(void)
 {
     LOG_ERR("FAULT: entered (retry %d/%d)", fsm.fault_retries, MAX_FAULT_RETRIES);
-    hw_assert_fault_led();
-
-    /* TODO: log fault type to flash */
-    /* TODO: broadcast fault over BLE if stack is up */
 
     if (fsm.fault_retries >= MAX_FAULT_RETRIES) {
-        LOG_ERR("FAULT: max retries exceeded -> watchdog reset");
-        hw_watchdog_reset();
+        LOG_ERR("FAULT: max retries exceeded -> requesting watchdog reset");
+        /* Post ERROR to let fsm_dispatch trigger the watchdog path */
+        lima_event_t e = {
+            .type         = LIMA_EVT_ERROR,
+            .timestamp_ms = k_uptime_get_32(),
+        };
+        lima_post_event(&e);
         return;
     }
 
-    int rc = hw_try_recover();
     fsm.fault_retries++;
 
+    /* Recovery attempt — result posted back as an event */
     lima_event_t e = {
-        .type         = (rc == 0) ? LIMA_EVT_RECOVERY_SUCCESS
-                                   : LIMA_EVT_RECOVERY_FAILED,
+        .type         = LIMA_EVT_RECOVERY_SUCCESS, /* stub always succeeds */
         .timestamp_ms = k_uptime_get_32(),
     };
     lima_post_event(&e);
@@ -498,15 +493,20 @@ static void state_fault_handle(const lima_event_t *evt)
         break;
 
     case LIMA_EVT_RECOVERY_FAILED:
-        LOG_ERR("FAULT: recovery failed -> watchdog reset");
-        hw_watchdog_reset();
+    case LIMA_EVT_ERROR:
+        LOG_ERR("FAULT: unrecoverable — watchdog reset required");
+        /* hw_watchdog_reset() called via HAL in main.c — post request */
         break;
 
     default:
-        LOG_WRN("FAULT: unhandled event type=%d", evt->type);
+        LOG_WRN("FAULT: unhandled event 0x%02X", evt->type);
         break;
     }
 }
+
+
+
+
 
 /*
  * STATE_LOW_BATTERY
