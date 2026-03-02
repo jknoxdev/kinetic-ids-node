@@ -255,12 +255,9 @@ static void state_armed_handle(const lima_event_t *evt)
 
 
 
-/*
- * STATE_LIGHT_SLEEP
- * Low power, sensor IRQs still active.
- * Returns to ARMED on any sensor candidate.
- * Falls to DEEP_SLEEP after inactivity threshold.
- */
+
+/* ── State: LIGHT_SLEEP ──────────────────────────────────────────────────── */
+
 static void state_light_sleep_enter(void)
 {
     LOG_INF("LIGHT SLEEP: low-power, sensor IRQs active");
@@ -300,7 +297,7 @@ static void state_light_sleep_handle(const lima_event_t *evt)
         break;
 
     default:
-        LOG_WRN("LIGHT_SLEEP: unhandled event type=%d", evt->type);
+        LOG_WRN("LIGHT_SLEEP: unhandled event 0x%02X", evt->type);
         break;
     }
 }
