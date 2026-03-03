@@ -31,7 +31,7 @@
 #include "events.h"
 #include "fsm.h"
 
-LOG_MODULE_REGISTER(lima_main, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(lima_main, LOG_LEVEL_INF);
 
 #define I2C0_SCL_PIN 19
 #define I2C0_SDA_PIN 20
@@ -360,7 +360,7 @@ static void sensor_thread_fn(void *p1, void *p2, void *p3)
 
     while (1) {
         lima_state_t s = fsm_get_state();
-        LOG_INF("Sensor thread: gathering FSM state...");
+        LOG_DBG("Sensor thread: gathering FSM state...");
         if (s == STATE_ARMED || s == STATE_LIGHT_SLEEP) {
             double magnitude = hw_read_imu();
 
