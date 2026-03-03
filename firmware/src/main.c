@@ -318,14 +318,17 @@ void fsm_hw_set_led(lima_state_t state)
 static void sensor_thread_fn(void *p1, void *p2, void *p3)
 {
     ARG_UNUSED(p1); ARG_UNUSED(p2); ARG_UNUSED(p3);
-    LOG_INF("Sensor thread started");
+    LOG_INF("Sensor thread started... sleeping 500ms for FSM boot & calibration...");
 
     /* Wait for FSM to finish BOOT + CALIBRATING */
     k_sleep(K_MSEC(500));
 
+    LOG_INF("Sensor thread: 500ms expired...");
+
+
     while (1) {
         lima_state_t s = fsm_get_state();
-
+        LOG_INF("Sensor thread: gathering FSM state...");
         if (s == STATE_ARMED || s == STATE_LIGHT_SLEEP) {
             double magnitude = hw_read_imu();
 

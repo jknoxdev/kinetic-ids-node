@@ -10,7 +10,7 @@
 #include <zephyr/logging/log.h>
 #include "fsm.h"
 
-LOG_MODULE_REGISTER(lima_fsm), LOG_LEVEL_DBG;
+LOG_MODULE_REGISTER(lima_fsm, LOG_LEVEL_DBG);
 
 /* ── FSM Context (single instance) ──────────────────────────────────────── */
 lima_fsm_ctx_t fsm = {
@@ -157,7 +157,7 @@ static void tx_timeout_cb(struct k_work *work)
 
 static void state_boot_enter(void)
 {
-    LOG_INF("BOOT: initializing");
+    LOG_INF("BOOT: entered");
     /* Hardware init is handled by main.c before fsm_init() is called.
        If sensors failed, main.c should post LIMA_EVT_ERROR before this runs.
        On success, post INIT_COMPLETE to drive the transition. */
@@ -520,6 +520,7 @@ void fsm_init(void)
 
     current_state = STATE_BOOT;
     fsm_hw_set_led(STATE_BOOT);
+    state_boot_enter(); 
 
     LOG_INF("FSM: Initialized in %s", fsm_state_to_str(current_state));
 }
