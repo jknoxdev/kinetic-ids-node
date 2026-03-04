@@ -441,7 +441,7 @@ int main(void)
     }
 
     k_work_init_delayable(&sleep_led_work, sleep_led_expiry_fn);
-    
+
     LOG_INF("Starting LIMA threads...");
     k_thread_resume(fsm_thread);
     k_thread_resume(sensor_thread);

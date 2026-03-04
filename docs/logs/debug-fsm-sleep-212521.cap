@@ -1,0 +1,68 @@
+[00:00:36.352,691] <inf> lima_fsm: INACTIVITY: 30s window reached -> Deep Sleep
+[00:00:36.352,813] <inf> lima_fsm: FSM: ARMED -> DEEP_SLEEP
+[00:00:37.154,205] <inf> lima_fsm: DEEP SLEEP: BLE off, RTC wakeup only
+[00:00:37.154,205] <inf> lima_main: [SLEEP] entering deep sleep â interval 15000 ms
+[00:00:52.154,296] <inf> lima_main: [SLEEP] deep sleep expired â waking
+[00:00:52.154,418] <inf> lima_main: [STUB] ble_stop
+[00:00:00.331,970] <inf> udc_nrf: Preinit
+*** Booting nRF Connect SDK v3.2.2-74845e169be2 ***
+*** Using Zephyr OS v4.2.99-fe4f0106803e ***
+[00:00:00.335,479] <inf> udc_nrf: Initialized
+[00:00:00.335,968] <inf> lima_main: L.I.M.A. node firmware starting
+[00:00:00.335,968] <inf> lima_main: L.I.M.A.: suspending threads...
+[00:00:00.336,212] <inf> lima_main: BOOT: I2C bus recovery on P0.19/P0.20
+[00:00:00.336,700] <inf> lima_main: BOOT: I2C recovery complete
+[00:00:00.336,822] <inf> lima_main: MPU6050 ready
+[00:00:00.339,874] <inf> udc_nrf: SUSPEND state detected
+[00:00:00.451,660] <inf> udc_nrf: Reset
+[00:00:00.451,721] <inf> udc: ep 0x80 is not halted|disabled
+[00:00:00.451,751] <inf> udc_nrf: RESUMING from suspend
+[00:00:00.710,906] <inf> udc_nrf: Reset
+[00:00:00.710,968] <inf> udc: ep 0x80 is not halted|disabled
+[00:00:00.797,729] <inf> udc_nrf: SUSPEND state detected
+[00:00:00.837,371] <inf> udc_nrf: Reset
+[00:00:00.837,402] <inf> udc: ep 0x80 is not halted|disabled
+[00:00:00.837,463] <inf> udc_nrf: RESUMING from suspend
+[00:00:00.912,994] <inf> udc_nrf: Reset
+[00:00:00.913,055] <inf> udc: ep 0x80 is not halted|disabled
+[00:00:00.997,833] <inf> udc: Sequence 2 not completed
+[00:00:00.998,168] <inf> udc: Sequence 2 not completed
+[00:00:00.998,504] <inf> udc: Sequence 2 not completed
+[00:00:01.337,066] <inf> lima_main: USB settle: 1/6
+[00:00:02.337,188] <inf> lima_main: USB settle: 2/6
+[00:00:03.337,371] <inf> lima_main: USB settle: 3/6
+[00:00:04.337,524] <inf> lima_main: USB settle: 4/6
+[00:00:05.337,615] <inf> lima_main: USB settle: 5/6
+[00:00:06.337,799] <inf> lima_main: USB settle: 6/6
+[00:00:06.337,890] <inf> lima_main: Starting LIMA threads...
+[00:00:06.338,043] <inf> lima_main: FSM thread started
+[00:00:06.338,043] <inf> lima_fsm: FSM: Initializing work items
+[00:00:06.338,165] <inf> lima_fsm: BOOT: entered
+[00:00:06.338,317] <inf> lima_fsm: FSM: Initialized in BOOT
+[00:00:06.338,348] <inf> lima_fsm: FSM: BOOT -> CALIBRATING
+[00:00:06.338,531] <inf> lima_fsm: CALIBRATING: warming up sensors
+[00:00:06.338,653] <inf> lima_fsm: FSM: CALIBRATING -> ARMED
+[00:00:06.338,775] <inf> lima_fsm: ARMED: sensors active, heartbeat started
+[00:00:06.339,019] <inf> lima_main: Sensor thread started... sleeping 500ms for FSM boot & calibration...
+[00:00:06.839,294] <inf> lima_main: Sensor thread: 500ms expired...
+[00:00:18.338,897] <inf> lima_fsm: ARMED: dwell timer expired -> sleep eligible
+[00:00:18.338,958] <inf> lima_fsm: ARMED: dwell complete -> LIGHT_SLEEP
+[00:00:18.339,080] <inf> lima_fsm: FSM: ARMED -> LIGHT_SLEEP
+[00:00:18.940,216] <inf> lima_fsm: LIGHT SLEEP: low-power, sensor IRQs active
+[00:00:18.940,307] <inf> lima_main: [SLEEP] light sleep active â waiting for sensor IRQ or inactivity timeout
+[00:00:18.940,429] <inf> lima_fsm: FSM: LIGHT_SLEEP -> ARMED
+[00:00:18.940,460] <inf> lima_fsm: ARMED: sensors active, heartbeat started
+[00:00:30.940,643] <inf> lima_fsm: ARMED: dwell timer expired -> sleep eligible
+[00:00:30.940,704] <inf> lima_fsm: ARMED: dwell complete -> LIGHT_SLEEP
+[00:00:30.940,826] <inf> lima_fsm: FSM: ARMED -> LIGHT_SLEEP
+[00:00:31.541,656] <inf> lima_fsm: LIGHT SLEEP: low-power, sensor IRQs active
+[00:00:31.541,656] <inf> lima_main: [SLEEP] light sleep active â waiting for sensor IRQ or inactivity timeout
+[00:00:31.541,778] <inf> lima_fsm: FSM: LIGHT_SLEEP -> ARMED
+[00:00:31.541,870] <inf> lima_fsm: ARMED: sensors active, heartbeat started
+[00:00:36.338,867] <inf> lima_fsm: INACTIVITY: 30s window reached -> Deep Sleep
+[00:00:36.339,080] <inf> lima_fsm: FSM: ARMED -> DEEP_SLEEP
+[00:00:37.140,533] <inf> lima_fsm: DEEP SLEEP: BLE off, RTC wakeup only
+[00:00:37.140,533] <inf> lima_main: [SLEEP] entering deep sleep â interval 15000 ms
+[00:00:52.140,686] <inf> lima_main: [SLEEP] deep sleep expired â waking
+[00:00:52.140,777] <inf> lima_main: [STUB] ble_stop
+

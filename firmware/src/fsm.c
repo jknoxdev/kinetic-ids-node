@@ -299,15 +299,11 @@ static void state_light_sleep_handle(const lima_event_t *evt)
         break;
 
     case LIMA_EVT_POLL_TICK:
-        if ((k_uptime_get_32() - fsm.armed_since_ms) > SLEEP_INACTIVITY_MS) {
-            lima_event_t e = {
-                .type         = LIMA_EVT_SLEEP_TIMER_EXPIRY,
-                .timestamp_ms = k_uptime_get_32(),
-            };
-            lima_post_event(&e);
-        } else {
-            transition(STATE_ARMED);
-        }
+        /* Intentionally ignored — LIGHT_SLEEP exits only on:
+        * 1. Sensor event (IRQ) → EVENT_DETECTED
+        * 2. Inactivity timeout → DEEP_SLEEP
+        * Keepalive heartbeat belongs in ARMED (v2). See FUTURE.md */
+        LOG_DBG("LIGHT_SLEEP: ignoring poll tick");
         break;
 
     case LIMA_EVT_INACTIVITY_TIMEOUT:
