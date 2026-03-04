@@ -180,11 +180,9 @@ static int hw_enable_irqs(void)
 
 static int hw_enter_light_sleep(void)
 {
-    LOG_INF("[SLEEP] entering light sleep — heartbeat interval %d ms", 
-            CONFIG_LIMA_LIGHT_SLEEP_HEARTBEAT_MS);
-    // TODO: real PM suspend goes here
-    k_msleep(CONFIG_LIMA_LIGHT_SLEEP_HEARTBEAT_MS);
-    LOG_INF("[SLEEP] light sleep expired — waking");
+    LOG_INF("[SLEEP] light sleep active — waiting for sensor IRQ or inactivity timeout");
+    // TODO: real PM_STATE_SUSPEND_TO_IDLE goes here
+    // Duration is now owned by inactivity_work timer in fsm.c
     return 0;
 }
 
