@@ -69,6 +69,9 @@ static struct k_work_delayable sleep_led_work;
 static uint8_t sleep_led_on = 0;
 static uint32_t sleep_led_interval_ms = 0;
 
+/* RTC wakeup stub  */
+static struct k_work_delayable rtc_wakeup_work;
+
 /* ── Message queue ───────────────────────────────────────────────────────── */
 
 K_MSGQ_DEFINE(fsm_msgq, sizeof(lima_event_t), FSM_MSGQ_DEPTH, 4);
@@ -118,6 +121,17 @@ static void sleep_led_expiry_fn(struct k_work *work)
     if (sleep_led_interval_ms > 0) {
         k_work_reschedule(&sleep_led_work, K_MSEC(sleep_led_interval_ms));
     }
+}
+
+static void rtc_wakeup_expiry_fn(struct k_work *work)
+{
+    ARG_UNUSED(work);
+    LOG_INF("[RTC] wakeup timer fired — posting LIMA_EVT_RTC_WAKEUP");
+    lima_event_t e = {
+        .type         = LIMA_EVT_RTC_WAKEUP,
+        .timestamp_ms = k_uptime_get_32(),
+    };
+    lima_post_event(&e);
 }
 
 /* ── Hardware Abstraction Layer ──────────────────────────────────────────── */
@@ -277,6 +291,9 @@ void fsm_hw_enter_deep_sleep(void)
 {
     hw_enter_deep_sleep();
     hw_ble_stop();
+     /* Stub RTC wakeup — real PM_STATE_SOFT_OFF replaces this in v2 */
+    k_work_reschedule(&rtc_wakeup_work, 
+    K_MSEC(CONFIG_LIMA_DEEP_SLEEP_INTERVAL_MS));
 }
 
 /**
@@ -441,6 +458,7 @@ int main(void)
     }
 
     k_work_init_delayable(&sleep_led_work, sleep_led_expiry_fn);
+    k_work_init_delayable(&rtc_wakeup_work, rtc_wakeup_expiry_fn);
 
     LOG_INF("Starting LIMA threads...");
     k_thread_resume(fsm_thread);

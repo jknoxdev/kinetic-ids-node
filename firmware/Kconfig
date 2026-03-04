@@ -16,9 +16,9 @@ config LIMA_FSM_LOG_LEVEL
 #     int "Light sleep heartbeat interval (ms)"
 #     default 10000
 
-# config LIMA_DEEP_SLEEP_INTERVAL_MS
-#     int "Deep sleep wakeup interval (ms)"
-#     default 45000
+config LIMA_DEEP_SLEEP_INTERVAL_MS
+    int "Deep sleep wakeup interval (ms)"
+    default 45000
 
 # config LIMA_INACTIVITY_TIMEOUT_MS
 #     int "Inactivity timeout before deep sleep (ms)"
