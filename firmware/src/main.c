@@ -61,8 +61,12 @@ static const struct gpio_dt_spec led_r = GPIO_DT_SPEC_GET(LED_R_NODE, gpios);
 static const struct gpio_dt_spec led_g = GPIO_DT_SPEC_GET(LED_G_NODE, gpios);
 static const struct gpio_dt_spec led_b = GPIO_DT_SPEC_GET(LED_B_NODE, gpios);
 
+/* motion sensor */
 static const struct device *mpu;
 static struct sensor_value accel[3];
+
+/* baro sensor */
+static const struct device *bme;
 
 /* Sleep LED state */
 static struct k_work_delayable sleep_led_work;
@@ -149,6 +153,18 @@ static int hw_init_sensors(void)
         return -ENODEV;
     }
     LOG_INF("MPU6050 ready");
+
+    bme = DEVICE_DT_GET_ANY(bosch_bme280);
+    
+    if (bme == NULL) {
+        LOG_ERR("BME280 device not found in devicetree!");
+        return -ENODEV;
+    }
+    if (!device_is_ready(bme)) {
+        LOG_ERR("BME280 not ready!");
+        return -ENODEV;
+    }
+    LOG_INF("BME280 ready");
     return 0;
 }
 
