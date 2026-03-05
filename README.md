@@ -10,6 +10,7 @@
 [![Status](https://img.shields.io/badge/status-WIP-red?style=flat-square)](#roadmap)
 ![Last Commit](https://img.shields.io/github/last-commit/jknoxdev/lima-node)
 
+
 > ⚠️ **Work in Progress**
 >
 > L.I.M.A Node is under active development. The current phase focuses on
@@ -136,22 +137,40 @@ west flash
 
 ```
 lima-node/
-├── firmware/               # nRF52840 Zephyr firmware
+├── .github/
+│   └── workflows/                 # CI (PlantUML render, etc.)
+├── artifacts/                     # Bench captures / exports
 ├── docs/
-│   ├── FLASHING.md         # Build + flash guide
-│   └── architecture/
-│       ├── context.puml    # System context diagram
-│       ├── component.puml  # Component diagram
-│       ├── sequence.puml   # Event sequence diagram
-│       ├── state.puml      # Firmware state machine
-│       └── adr/
-│           ├── ADR-001-nrf52840-selection.md
-│           ├── ADR-002-ble-vs-alternatives.md
-│           ├── ADR-003-mqtt-vs-alternatives.md
-│           └── ADR-004-zephyr-vs-alternatives.md
-├── artifacts/              # Scope captures, logic analyzer exports
-├── west.yml                # NCS workspace manifest
-└── README.md
+│   ├── analysis/                  # Design notes / analysis
+│   ├── architecture/              # PlantUML sources + rendered diagrams
+│   │   ├── adr/                   # Architecture Decision Records
+│   │   ├── context.puml|svg|png
+│   │   ├── component.puml|svg|png
+│   │   ├── sequence.puml|svg|png
+│   │   ├── state.puml|svg|png
+│   │   └── overview.puml|svg|png
+│   ├── build/                     # Build / flash / dev setup
+│   │   ├── FLASHING.md
+│   │   ├── DEV_SETUP.md
+│   │   └── quickref.md
+│   ├── logs/                      # Test logs / traces
+│   ├── media/                     # Images used in docs/README
+│   ├── resources/                 # Reference material
+│   └── verification/              # Validation notes + results
+├── firmware/                      # Zephyr firmware (nRF52840)
+│   ├── boards/
+│   ├── src/
+│   │   ├── main.c
+│   │   ├── fsm.c
+│   │   ├── fsm.h
+│   │   └── events.h
+│   ├── CMakeLists.txt
+│   ├── Kconfig
+│   └── prj.conf
+├── LICENSE
+├── README.md
+├── SECURITY.md
+└── west.yml                       # NCS workspace manifest
 ```
 
 ---
