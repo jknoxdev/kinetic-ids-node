@@ -1,0 +1,163 @@
+[00:00:00.000,305] <inf> udc_nrf: Preinit
+*** Booting nRF Connect SDK v3.2.2-74845e169be2 ***
+*** Using Zephyr OS v4.2.99-fe4f0106803e ***
+[00:00:00.016,662] <inf> udc_nrf: Initialized
+[00:00:00.017,120] <inf> lima_main: L.I.M.A. node firmware starting
+[00:00:00.017,150] <inf> lima_main: L.I.M.A.: suspending threads...
+[00:00:00.017,395] <inf> lima_main: BOOT: I2C bus recovery on P0.19/P0.20
+[00:00:00.017,913] <inf> lima_main: BOOT: I2C recovery complete
+[00:00:00.018,005] <inf> lima_main: MPU6050 ready
+[00:00:00.018,005] <inf> lima_main: BME280 ready
+[00:00:00.020,965] <inf> udc_nrf: SUSPEND state detected
+[00:00:00.321,166] <inf> udc_nrf: Reset
+[00:00:00.321,228] <inf> udc: ep 0x80 is not halted|disabled
+[00:00:00.321,258] <inf> udc_nrf: RESUMING from suspend
+[00:00:00.394,439] <inf> udc_nrf: Reset
+[00:00:00.394,500] <inf> udc: ep 0x80 is not halted|disabled
+[00:00:00.478,698] <inf> udc: Sequence 2 not completed
+[00:00:00.479,003] <inf> udc: Sequence 2 not completed
+[00:00:00.479,339] <inf> udc: Sequence 2 not completed
+[00:00:01.018,096] <inf> lima_main: USB settle: 1/6
+[00:00:02.018,280] <inf> lima_main: USB settle: 2/6
+[00:00:03.018,463] <inf> lima_main: USB settle: 3/6
+[00:00:04.018,615] <inf> lima_main: USB settle: 4/6
+[00:00:05.018,859] <inf> lima_main: USB settle: 5/6
+[00:00:06.019,073] <inf> lima_main: USB settle: 6/6
+[00:00:06.019,927] <inf> lima_crypto: CRYPTO: P-256 keypair generated (volatile, id=0x40000000)
+[00:00:06.019,927] <err> lima_crypto: CRYPTO: public key export failed (-134)
+[00:00:06.020,050] <inf> lima_crypto: CRYPTO: initialized â ECDSA-P256/SHA-256 ready (key_id=0x40000000)
+[00:00:06.020,050] <inf> lima_crypto: CRYPTO: initialized â ECDSA-P256/SHA-256 ready
+[00:00:06.020,050] <inf> lima_main: Starting LIMA threads...
+[00:00:06.020,111] <inf> lima_main: FSM thread started
+[00:00:06.020,111] <inf> lima_fsm: FSM: Initializing work items
+[00:00:06.020,416] <inf> lima_fsm: BOOT: entered
+[00:00:06.020,568] <inf> lima_fsm: FSM: Initialized in BOOT
+[00:00:06.020,690] <inf> lima_fsm: FSM: BOOT -> CALIBRATING
+[00:00:06.020,782] <inf> lima_fsm: CALIBRATING: warming up sensors
+[00:00:06.020,935] <inf> lima_fsm: FSM: CALIBRATING -> ARMED
+[00:00:06.021,057] <inf> lima_fsm: ARMED: sensors active, heartbeat started
+[00:00:06.021,118] <inf> lima_main: Sensor thread started... sleeping 500ms for FSM boot & calibration...
+[00:00:06.521,514] <inf> lima_main: Sensor thread: 500ms expired...
+[00:00:06.525,726] <inf> lima_main: BARO: baseline set to 99.94 hPa
+[00:00:07.629,638] <inf> lima_main: BARO: delta=-6.59 Pa (threshold=5)
+[00:00:07.629,974] <inf> lima_fsm: FSM: ARMED -> EVENT_DETECTED
+[00:00:07.630,004] <inf> lima_fsm: EVENT DETECTED: type=0x01 at t=7629 ms
+[00:00:07.630,035] <inf> lima_fsm: FSM: EVENT_DETECTED -> SIGNING
+[00:00:07.630,249] <inf> lima_fsm: SIGNING: building payload and signing...
+[00:00:07.736,999] <inf> lima_crypto: CRYPTO: signed 64 bytes â sig[0..3]=B065DA31
+[00:00:07.737,091] <inf> lima_fsm: SIGNING: sig[0..7]=B065DA31A54DC2CB
+[00:00:07.737,213] <inf> lima_fsm: SIGNING: payload ready -> TRANSMITTING
+[00:00:07.737,335] <inf> lima_fsm: FSM: SIGNING -> TRANSMITTING
+[00:00:07.737,365] <inf> lima_fsm: TRANSMITTING: advertising signed payload via BLE
+[00:00:07.737,396] <inf> lima_fsm: TRANSMITTING: confirmed -> COOLDOWN
+[00:00:07.737,609] <inf> lima_fsm: FSM: TRANSMITTING -> COOLDOWN
+[00:00:07.737,731] <inf> lima_fsm: COOLDOWN: suppressing events for 5000 ms
+[00:00:12.737,792] <inf> lima_fsm: COOLDOWN: timer expired
+[00:00:12.737,915] <inf> lima_fsm: COOLDOWN: expired -> ARMED
+[00:00:12.737,945] <inf> lima_fsm: FSM: COOLDOWN -> ARMED
+[00:00:12.738,067] <inf> lima_fsm: ARMED: sensors active, heartbeat started
+[00:00:14.358,337] <inf> lima_main: MOTION: 1.31 g (threshold=0.80)
+[00:00:14.358,703] <inf> lima_fsm: FSM: ARMED -> EVENT_DETECTED
+[00:00:14.358,703] <inf> lima_fsm: EVENT DETECTED: type=0x02 at t=14358 ms
+[00:00:14.358,825] <inf> lima_fsm: FSM: EVENT_DETECTED -> SIGNING
+[00:00:14.358,947] <inf> lima_fsm: SIGNING: building payload and signing...
+[00:00:14.465,881] <inf> lima_crypto: CRYPTO: signed 64 bytes â sig[0..3]=B3C00012
+[00:00:14.465,881] <inf> lima_fsm: SIGNING: sig[0..7]=B3C000128E6D780A
+[00:00:14.466,003] <inf> lima_fsm: SIGNING: payload ready -> TRANSMITTING
+[00:00:14.466,125] <inf> lima_fsm: FSM: SIGNING -> TRANSMITTING
+[00:00:14.466,247] <inf> lima_fsm: TRANSMITTING: advertising signed payload via BLE
+[00:00:14.466,369] <inf> lima_fsm: TRANSMITTING: confirmed -> COOLDOWN
+[00:00:14.466,400] <inf> lima_fsm: FSM: TRANSMITTING -> COOLDOWN
+[00:00:14.466,430] <inf> lima_fsm: COOLDOWN: suppressing events for 5000 ms
+[00:00:19.466,705] <inf> lima_fsm: COOLDOWN: timer expired
+[00:00:19.466,827] <inf> lima_fsm: COOLDOWN: expired -> ARMED
+[00:00:19.466,857] <inf> lima_fsm: FSM: COOLDOWN -> ARMED
+[00:00:19.466,979] <inf> lima_fsm: ARMED: sensors active, heartbeat started
+[00:00:20.058,990] <err> MPU6050: Failed to read data sample.
+[00:00:20.058,990] <wrn> lima_main: MPU6050: fetch failed (-5)
+[00:00:22.467,102] <inf> lima_fsm: ARMED: dwell timer expired -> sleep eligible
+[00:00:22.467,193] <inf> lima_fsm: ARMED: dwell complete -> LIGHT_SLEEP
+[00:00:22.467,224] <inf> lima_fsm: FSM: ARMED -> LIGHT_SLEEP
+[00:00:22.467,254] <inf> lima_fsm: LIGHT SLEEP: low-power, sensor IRQs active
+[00:00:22.467,346] <inf> lima_main: [SLEEP] light sleep active â waiting for sensor IRQ or inactivity timeout
+[00:00:27.467,071] <inf> lima_fsm: INACTIVITY: 30s window reached -> Deep Sleep
+[00:00:27.467,163] <inf> lima_fsm: FSM: LIGHT_SLEEP -> DEEP_SLEEP
+[00:00:27.467,254] <inf> lima_fsm: DEEP SLEEP: BLE off, RTC wakeup only
+[00:00:27.467,285] <inf> lima_main: [SLEEP] deep sleep active â waiting for RTC wakeup event
+[00:00:27.467,285] <inf> lima_main: [STUB] ble_stop
+[00:00:33.467,376] <inf> lima_main: [RTC] wakeup timer fired â posting LIMA_EVT_RTC_WAKEUP
+[00:00:33.467,529] <inf> lima_fsm: DEEP SLEEP: RTC wakeup -> ARMED
+[00:00:33.467,590] <inf> lima_fsm: FSM: DEEP_SLEEP -> ARMED
+[00:00:33.467,773] <inf> lima_fsm: ARMED: sensors active, heartbeat started
+[00:00:36.094,635] <inf> lima_main: MOTION: 1.89 g (threshold=0.80)
+[00:00:36.095,001] <inf> lima_fsm: FSM: ARMED -> EVENT_DETECTED
+[00:00:36.095,031] <inf> lima_fsm: EVENT DETECTED: type=0x02 at t=36094 ms
+[00:00:36.095,153] <inf> lima_fsm: FSM: EVENT_DETECTED -> SIGNING
+[00:00:36.095,275] <inf> lima_fsm: SIGNING: building payload and signing...
+[00:00:36.199,829] <inf> lima_crypto: CRYPTO: signed 64 bytes â sig[0..3]=44FF3680
+[00:00:36.199,951] <inf> lima_fsm: SIGNING: sig[0..7]=44FF368064C1C08E
+[00:00:36.199,981] <inf> lima_fsm: SIGNING: payload ready -> TRANSMITTING
+[00:00:36.200,103] <inf> lima_fsm: FSM: SIGNING -> TRANSMITTING
+[00:00:36.200,195] <inf> lima_fsm: TRANSMITTING: advertising signed payload via BLE
+[00:00:36.200,347] <inf> lima_fsm: TRANSMITTING: confirmed -> COOLDOWN
+[00:00:36.200,469] <inf> lima_fsm: FSM: TRANSMITTING -> COOLDOWN
+[00:00:36.200,592] <inf> lima_fsm: COOLDOWN: suppressing events for 5000 ms
+[00:00:41.200,683] <inf> lima_fsm: COOLDOWN: timer expired
+[00:00:41.200,775] <inf> lima_fsm: COOLDOWN: expired -> ARMED
+[00:00:41.200,805] <inf> lima_fsm: FSM: COOLDOWN -> ARMED
+[00:00:41.200,836] <inf> lima_fsm: ARMED: sensors active, heartbeat started
+[00:00:44.200,927] <inf> lima_fsm: ARMED: dwell timer expired -> sleep eligible
+[00:00:44.201,202] <inf> lima_fsm: ARMED: dwell complete -> LIGHT_SLEEP
+[00:00:44.201,324] <inf> lima_fsm: FSM: ARMED -> LIGHT_SLEEP
+[00:00:44.201,354] <inf> lima_fsm: LIGHT SLEEP: low-power, sensor IRQs active
+[00:00:44.201,354] <inf> lima_main: [SLEEP] light sleep active â€” waiting for sensor IRQ or inactivity timeout
+[00:00:44.391,876] <inf> lima_main: BARO: delta=-9.08 Pa (threshold=5)
+[00:00:44.392,120] <inf> lima_fsm: FSM: LIGHT_SLEEP -> EVENT_DETECTED
+[00:00:44.392,150] <inf> lima_fsm: EVENT DETECTED: type=0x01 at t=44391 ms
+[00:00:44.392,333] <inf> lima_fsm: FSM: EVENT_DETECTED -> SIGNING
+[00:00:44.392,456] <inf> lima_fsm: SIGNING: building payload and signing...
+[00:00:44.496,948] <inf> lima_crypto: CRYPTO: signed 64 bytes â sig[0..3]=7D6BC56E
+[00:00:44.496,978] <inf> lima_fsm: SIGNING: sig[0..7]=7D6BC56EA9BECEC7
+[00:00:44.497,100] <inf> lima_fsm: SIGNING: payload ready -> TRANSMITTING
+[00:00:44.497,222] <inf> lima_fsm: FSM: SIGNING -> TRANSMITTING
+[00:00:44.497,314] <inf> lima_fsm: TRANSMITTING: advertising signed payload via BLE
+[00:00:44.497,436] <inf> lima_fsm: TRANSMITTING: confirmed -> COOLDOWN
+[00:00:44.497,467] <inf> lima_fsm: FSM: TRANSMITTING -> COOLDOWN
+[00:00:44.497,497] <inf> lima_fsm: COOLDOWN: suppressing events for 5000 ms
+[00:00:49.200,927] <inf> lima_fsm: INACTIVITY: 30s window reached -> Deep Sleep
+[00:00:49.497,589] <inf> lima_fsm: COOLDOWN: timer expired
+[00:00:49.497,650] <inf> lima_fsm: COOLDOWN: expired -> ARMED
+[00:00:49.497,711] <inf> lima_fsm: FSM: COOLDOWN -> ARMED
+[00:00:49.497,711] <inf> lima_fsm: ARMED: sensors active, heartbeat started
+[00:00:52.497,894] <inf> lima_fsm: ARMED: dwell timer expired -> sleep eligible
+[00:00:52.498,107] <inf> lima_fsm: ARMED: dwell complete -> LIGHT_SLEEP
+[00:00:52.498,229] <inf> lima_fsm: FSM: ARMED -> LIGHT_SLEEP
+[00:00:52.498,260] <inf> lima_fsm: LIGHT SLEEP: low-power, sensor IRQs active
+[00:00:52.498,352] <inf> lima_main: [SLEEP] light sleep active â waiting for sensor IRQ or inactivity timeout
+[00:00:57.497,924] <inf> lima_fsm: INACTIVITY: 30s window reached -> Deep Sleep
+[00:00:57.498,016] <inf> lima_fsm: FSM: LIGHT_SLEEP -> DEEP_SLEEP
+[00:00:57.498,199] <inf> lima_fsm: DEEP SLEEP: BLE off, RTC wakeup only
+[00:00:57.498,199] <inf> lima_main: [SLEEP] deep sleep active â waiting for RTC wakeup event
+[00:00:57.498,199] <inf> lima_main: [STUB] ble_stop
+[00:01:03.498,291] <inf> lima_main: [RTC] wakeup timer fired â posting LIMA_EVT_RTC_WAKEUP
+[00:01:03.498,382] <inf> lima_fsm: DEEP SLEEP: RTC wakeup -> ARMED
+[00:01:03.498,413] <inf> lima_fsm: FSM: DEEP_SLEEP -> ARMED
+[00:01:03.498,504] <inf> lima_fsm: ARMED: sensors active, heartbeat started
+[00:01:06.498,596] <inf> lima_fsm: ARMED: dwell timer expired -> sleep eligible
+[00:01:06.498,718] <inf> lima_fsm: ARMED: dwell complete -> LIGHT_SLEEP
+[00:01:06.498,809] <inf> lima_fsm: FSM: ARMED -> LIGHT_SLEEP
+[00:01:06.498,840] <inf> lima_fsm: LIGHT SLEEP: low-power, sensor IRQs active
+[00:01:06.498,870] <inf> lima_main: [SLEEP] light sleep active â waiting for sensor IRQ or inactivity timeout
+[00:01:07.952,331] <inf> lima_main: BARO: delta=29.13 Pa (threshold=5)
+[00:01:07.952,606] <inf> lima_fsm: FSM: LIGHT_SLEEP -> EVENT_DETECTED
+[00:01:07.952,636] <inf> lima_fsm: EVENT DETECTED: type=0x01 at t=67952 ms
+[00:01:07.952,850] <inf> lima_fsm: FSM: EVENT_DETECTED -> SIGNING
+[00:01:07.952,941] <inf> lima_fsm: SIGNING: building payload and signing...
+[00:01:08.057,434] <inf> lima_crypto: CRYPTO: signed 64 bytes â sig[0..3]=7A5DDC65
+[00:01:08.057,556] <inf> lima_fsm: SIGNING: sig[0..7]=7A5DDC650FE01679
+[00:01:08.057,586] <inf> lima_fsm: SIGNING: payload ready -> TRANSMITTING
+[00:01:08.057,708] <inf> lima_fsm: FSM: SIGNING -> TRANSMITTING
+[00:01:08.057,800] <inf> lima_fsm: TRANSMITTING: advertising signed payload via BLE
+[00:01:08.057,952] <inf> lima_fsm: TRANSMITTING: confirmed -> COOLDOWN
+[00:01:08.057,983] <inf> lima_fsm: FSM: TRANSMITTING -> COOLDOWN
+[00:01:08.057,983] <inf> lima_fsm: COOLDOWN: suppressing events for 5000 ms
