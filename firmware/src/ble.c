@@ -119,7 +119,9 @@ int lima_ble_advertise(const lima_payload_t *payload, lima_ble_cb_t cb)
             adv_payload_buf.node_id[2], adv_payload_buf.node_id[3],
             adv_payload_buf.node_id[4], adv_payload_buf.node_id[5],
             adv_payload_buf.event_type,
-            adv_payload_buf.sequence);
+            adv_payload_buf.sequence,
+            (double)adv_payload_buf.accel_g,
+            (double)adv_payload_buf.delta_pa);
 
     /* Store callback before starting adv */
     adv_cb = cb;

@@ -11,6 +11,7 @@
 #include <psa/crypto.h>
 #include "fsm.h"
 #include "crypto.h"
+#include "ble.h"
 
 LOG_MODULE_REGISTER(lima_fsm, LOG_LEVEL_INF);
 
@@ -425,18 +426,34 @@ static void state_signing_handle(const lima_event_t *evt)
 
 /* ── State: TRANSMITTING ─────────────────────────────────────────────────── */
 
+static void ble_tx_complete_cb(lima_ble_err_t err)
+{
+    lima_event_t e = {
+        .timestamp_ms = k_uptime_get_32(),
+    };
+
+    if (err == LIMA_BLE_OK) {
+        e.type = LIMA_EVT_TX_COMPLETE;
+        LOG_INF("TRANSMITTING: BLE advertisement complete");
+    } else {
+        e.type = LIMA_EVT_BLE_FAULT;
+        LOG_ERR("TRANSMITTING: BLE advertisement failed");
+    }
+
+    lima_post_event(&e);
+}
+
 static void state_transmitting_enter(void)
 {
     LOG_INF("TRANSMITTING: advertising signed payload via BLE");
 
     k_work_reschedule(&tx_timeout_work, K_MSEC(TX_TIMEOUT_MS));
 
-    /* Stub: real impl fires callback on BLE completion */
-    lima_event_t e = {
-        .type         = LIMA_EVT_TX_COMPLETE,
-        .timestamp_ms = k_uptime_get_32(),
+    int err = lima_ble_advertise(&fsm.last_payload, ble_tx_complete_cb);
+    if (err != 0) {
+        LOG_ERR("TRANSMITTING: failed to start BLE adv (%d) -> FAULT", err);
+        transition(STATE_FAULT);
     };
-    lima_post_event(&e);
 }
 
 static void state_transmitting_handle(const lima_event_t *evt)
