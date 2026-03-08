@@ -1,0 +1,86 @@
+[00:00:00.000,305] <inf> udc_nrf: Preinit
+*** Booting nRF Connect SDK v3.2.2-74845e169be2 ***
+*** Using Zephyr OS v4.2.99-fe4f0106803e ***
+[00:00:00.016,998] <inf> udc_nrf: Initialized
+[00:00:00.017,486] <inf> lima_main: L.I.M.A. node firmware starting
+[00:00:00.017,486] <inf> lima_main: L.I.M.A.: suspending threads...
+[00:00:00.017,730] <inf> lima_main: BOOT: I2C bus recovery on P0.19/P0.20
+[00:00:00.018,341] <inf> lima_main: BOOT: I2C recovery complete
+[00:00:00.021,392] <inf> udc_nrf: SUSPEND state detected
+[00:00:00.068,450] <inf> lima_main: MPU6050 ready
+[00:00:00.068,450] <inf> lima_main: BME280 ready
+[00:00:00.317,993] <inf> udc_nrf: Reset
+[00:00:00.318,054] <inf> udc: ep 0x80 is not halted|disabled
+[00:00:00.318,084] <inf> udc_nrf: RESUMING from suspend
+[00:00:00.391,235] <inf> udc_nrf: Reset
+[00:00:00.391,265] <inf> udc: ep 0x80 is not halted|disabled
+[00:00:00.475,555] <inf> udc: Sequence 2 not completed
+[00:00:00.475,921] <inf> udc: Sequence 2 not completed
+[00:00:00.476,287] <inf> udc: Sequence 2 not completed
+[00:00:01.068,817] <inf> lima_main: USB settle: 1/6
+[00:00:02.069,091] <inf> lima_main: USB settle: 2/6
+[00:00:03.069,366] <inf> lima_main: USB settle: 3/6
+[00:00:04.069,488] <inf> lima_main: USB settle: 4/6
+[00:00:05.069,763] <inf> lima_main: USB settle: 5/6
+[00:00:06.069,824] <inf> lima_main: USB settle: 6/6
+[00:00:06.070,678] <inf> lima_crypto: CRYPTO: P-256 keypair generated (persistent, id=0x40000000)
+[00:00:06.070,709] <inf> lima_crypto: CRYPTO: existing key found at slot 0x00000001
+[00:00:06.161,346] <inf> lima_crypto: CRYPTO: public key (65 bytes):
+[00:00:06.161,468] <inf> lima_crypto:   pubkey:
+                                      04 2f ed 08 37 95 19 61  4c 7f 95 3a f4 02 41 43 |./..7..a L..:..AC
+                                      8c 3e 98 12 29 af 9e bb  a8 9d 1e 3b fc eb 7c ee |.>..)... ...;..|.
+                                      2a cd 53 3b 94 36 58 4c  68 9a 45 9d 3f 86 b4 af |*.S;.6XL h.E.?...
+                                      d2 ad 6a ab 42 e8 f8 a2  30 0c 90 40 b4 5f 29 38 |..j.B... 0..@._)8
+                                      46                                               |F                
+[00:00:06.161,468] <inf> lima_crypto: CRYPTO: initialized â ECDSA-P256/SHA-256 ready (key_id=0x40000000)
+[00:00:06.161,590] <inf> lima_crypto: CRYPTO: initialized â ECDSA-P256/SHA-256 ready
+[00:00:06.161,865] <inf> bt_sdc_hci_driver: SoftDevice Controller build revision: 
+                                            90 3d 6a f1 a5 ad 64 1d  cd 27 3e bf fc 68 0f 40 |.=j...d. .'>..h.@
+                                            40 99 ca ac                                      |@...             
+[00:00:06.165,557] <inf> bt_hci_core: HW Platform: Nordic Semiconductor (0x0002)
+[00:00:06.165,588] <inf> bt_hci_core: HW Variant: nRF52x (0x0002)
+[00:00:06.165,802] <inf> bt_hci_core: Firmware: Standard Bluetooth controller (0x00) Version 144.27197 Build 1689101809
+[00:00:06.167,175] <inf> bt_hci_core: HCI transport: SDC
+[00:00:06.167,449] <inf> bt_hci_core: Identity: F9:6C:A2:BD:24:F1 (random)
+[00:00:06.167,541] <inf> bt_hci_core: HCI: version 6.2 (0x10) revision 0x105e, manufacturer 0x0059
+[00:00:06.167,663] <inf> bt_hci_core: LMP: version 6.2 (0x10) subver 0x105e
+[00:00:06.167,694] <inf> lima_ble: BLE: initialized â LIMA_NODE_01 ready to advertise
+[00:00:06.167,694] <inf> lima_main: Starting LIMA threads...
+[00:00:06.167,785] <inf> lima_main: FSM thread started
+[00:00:06.167,816] <inf> lima_fsm: FSM: Initializing work items
+[00:00:06.167,846] <inf> lima_fsm: BOOT: entered
+[00:00:06.168,029] <inf> lima_fsm: FSM: Initialized in BOOT
+[00:00:06.168,151] <inf> lima_fsm: FSM: BOOT -> CALIBRATING
+[00:00:06.168,182] <inf> lima_fsm: CALIBRATING: warming up sensors
+[00:00:06.168,304] <inf> lima_fsm: FSM: CALIBRATING -> ARMED
+[00:00:06.168,334] <inf> lima_fsm: ARMED: sensors active, heartbeat started
+[00:00:06.168,426] <inf> lima_main: Sensor thread started... sleeping 500ms for FSM boot & calibration...
+[00:00:06.668,701] <inf> lima_main: Sensor thread: 500ms expired...
+[00:00:06.672,943] <inf> lima_main: BARO: baseline set to 98.75 hPa
+[00:00:09.168,487] <inf> lima_fsm: ARMED: dwell timer expired -> sleep eligible
+[00:00:09.168,701] <inf> lima_fsm: ARMED: dwell complete -> LIGHT_SLEEP
+[00:00:09.168,823] <inf> lima_fsm: FSM: ARMED -> LIGHT_SLEEP
+[00:00:09.168,945] <inf> lima_fsm: LIGHT SLEEP: low-power, sensor IRQs active
+[00:00:09.168,945] <inf> lima_main: [SLEEP] light sleep active â waiting for sensor IRQ or inactivity timeout
+[00:00:11.347,442] <inf> lima_main: MOTION: 1.68 g (threshold=0.80)
+[00:00:11.347,808] <inf> lima_fsm: FSM: LIGHT_SLEEP -> EVENT_DETECTED
+[00:00:11.347,900] <inf> lima_fsm: EVENT DETECTED: type=0x02 at t=11347 ms
+[00:00:11.348,022] <inf> lima_fsm: FSM: EVENT_DETECTED -> SIGNING
+[00:00:11.348,052] <inf> lima_fsm: SIGNING: building payload and signing...
+[00:00:11.459,350] <inf> lima_crypto: CRYPTO: signed 64 bytes â sig[0..3]=75D7622A
+[00:00:11.459,442] <inf> lima_fsm: SIGNING: sig[0..7]=75D7622A833FB132
+[00:00:11.459,472] <inf> lima_fsm: SIGNING: payload ready -> TRANSMITTING
+[00:00:11.459,594] <inf> lima_fsm: FSM: SIGNING -> TRANSMITTING
+[00:00:11.459,716] <inf> lima_fsm: TRANSMITTING: advertising signed payload via BLE
+[00:00:11.459,838] <inf> lima_ble: BLE: advertising â node=DE:AD:BE:EF:00:01 evt=0x02 seq=1
+[00:00:11.461,212] <inf> lima_ble: BLE: advertising for 500 ms
+[00:00:11.961,547] <inf> lima_ble: BLE: advertisement complete
+[00:00:11.961,578] <inf> lima_fsm: TRANSMITTING: BLE advertisement complete
+[00:00:11.961,761] <inf> lima_fsm: TRANSMITTING: confirmed -> COOLDOWN
+[00:00:11.961,883] <inf> lima_fsm: FSM: TRANSMITTING -> COOLDOWN
+[00:00:11.961,975] <inf> lima_fsm: COOLDOWN: suppressing events for 5000 ms
+[00:00:14.168,487] <inf> lima_fsm: INACTIVITY: 30s window reached -> Deep Sleep
+[00:00:16.962,066] <inf> lima_fsm: COOLDOWN: timer expired
+[00:00:16.962,310] <inf> lima_fsm: COOLDOWN: expired -> ARMED
+[00:00:16.962,432] <inf> lima_fsm: FSM: COOLDOWN -> ARMED
+[00:00:16.962,554] <inf> lima_fsm: ARMED: sensors active, heartbeat started
