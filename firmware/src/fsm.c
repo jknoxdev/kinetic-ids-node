@@ -25,10 +25,10 @@ lima_fsm_ctx_t fsm = {
 static lima_state_t current_state = STATE_BOOT;
 
 /* timeouts and their handlers */
-static struct k_work_delayable cooldown_work;
-static struct k_work_delayable tx_timeout_work;
-static struct k_work_delayable armed_dwell_work;
-static struct k_work_delayable inactivity_work;
+static struct k_work_delayable cooldown_work; //duped in main
+static struct k_work_delayable tx_timeout_work; //duped in main
+static struct k_work_delayable armed_dwell_work; 
+static struct k_work_delayable inactivity_work; 
 
 /* ── Forward Declarations ────────────────────────────────────────────────── */
 
@@ -140,6 +140,7 @@ static void transition(lima_state_t next)
 
 static void cooldown_expiry_cb(struct k_work *work)
 {
+    LOG_ERR("cooldown_work FIRED at %u ms", k_uptime_get_32());
     ARG_UNUSED(work);
     lima_event_t e = {
         .type         = LIMA_EVT_COOLDOWN_EXPIRED,
@@ -162,6 +163,7 @@ static void tx_timeout_cb(struct k_work *work)
 
 static void armed_dwell_expiry_cb(struct k_work *work)
 {
+    LOG_ERR("armed_dwell_work FIRED at %u ms", k_uptime_get_32());
     ARG_UNUSED(work);
     lima_event_t e = {
         .type         = LIMA_EVT_ARMED_TIMEOUT,
@@ -173,6 +175,7 @@ static void armed_dwell_expiry_cb(struct k_work *work)
 
 static void inactivity_expiry_cb(struct k_work *work)
 {
+    LOG_ERR("inactivity_work FIRED at %u ms", k_uptime_get_32());
     ARG_UNUSED(work);
     lima_event_t e = {
         .type         = LIMA_EVT_INACTIVITY_TIMEOUT,

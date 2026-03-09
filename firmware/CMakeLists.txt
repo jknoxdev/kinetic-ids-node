@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.20.0)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 # 3. This MUST come AFTER find_package
-project(lima_blinky)
+project(lima-node)
 
 # 4. This MUST come AFTER find_package because Zephyr defines 'app'
 target_sources(app PRIVATE 
