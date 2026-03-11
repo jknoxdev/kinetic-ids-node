@@ -45,9 +45,10 @@ static psa_status_t provision_key(psa_key_id_t *out_key_id)
 {
     psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
 
-    psa_set_key_lifetime(&attr, PSA_KEY_LIFETIME_VOLATILE);
-    // psa_set_key_lifetime(&attr, PSA_KEY_LIFETIME_PERSISTENT);
-    // psa_set_key_id(&attr, CONFIG_LIMA_CRYPTO_KEY_ID);
+    // psa_set_key_lifetime(&attr, PSA_KEY_LIFETIME_VOLATILE);
+    psa_set_key_lifetime(&attr, PSA_KEY_LIFETIME_PERSISTENT);
+    psa_set_key_id(&attr, CONFIG_LIMA_CRYPTO_KEY_ID); // persistent only
+
     psa_set_key_type(&attr,
         PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
     psa_set_key_bits(&attr, 256);
@@ -56,7 +57,7 @@ static psa_status_t provision_key(psa_key_id_t *out_key_id)
     psa_set_key_usage_flags(&attr,
         PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_EXPORT);
 
-    // psa_key_id_t key_id;
+    // psa_key_id_t key_id; // unused in new persistent code
     // psa_status_t status = psa_generate_key(&attr, &key_id);
     psa_status_t status = psa_generate_key(&attr, out_key_id);
 
@@ -69,8 +70,8 @@ static psa_status_t provision_key(psa_key_id_t *out_key_id)
 
     // LOG_INF("CRYPTO: P-256 keypair generated and stored in KMU slot 0x%08X",
     //         CONFIG_LIMA_CRYPTO_KEY_ID);
-    LOG_INF("CRYPTO: P-256 keypair generated (volatile, id=0x%08X)", *out_key_id);
-  
+    // LOG_INF("CRYPTO: P-256 keypair generated (volatile, id=0x%08X)", *out_key_id);
+    LOG_INF("CRYPTO: P-256 keypair generated (persistent, id=0x%08X)", *out_key_id);
     return PSA_SUCCESS;
 }
 
@@ -103,59 +104,41 @@ static void log_public_key(psa_key_id_t key_id)
 int lima_crypto_init(void)
 {
     psa_status_t status;
-    
-    status = psa_crypto_init();
 
+    status = psa_crypto_init();
     if (status != PSA_SUCCESS) {
         LOG_ERR("CRYPTO: psa_crypto_init failed (%d)", status);
         return -EIO;
     }
 
-        /* v1: volatile keys — always generate fresh on boot.
-     * Persistent key lookup via psa_get_key_attributes is only valid
-     * for PSA_KEY_LIFETIME_PERSISTENT keys backed by ITS storage.
-     * Attempting it with volatile IDs causes false-positive hits. */
-    status = provision_key(&signing_key_id);
-    if (status != PSA_SUCCESS) {
+    /* Check if persistent key already exists */
+    psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
+    status = psa_get_key_attributes(CONFIG_LIMA_CRYPTO_KEY_ID, &attr);
+    psa_reset_key_attributes(&attr);
+
+    if (status == PSA_SUCCESS) {
+        /* Key exists — load it */
+        LOG_INF("CRYPTO: existing key found at slot 0x%08X",
+                CONFIG_LIMA_CRYPTO_KEY_ID);
+        signing_key_id = CONFIG_LIMA_CRYPTO_KEY_ID;
+    } else if (status == PSA_ERROR_INVALID_HANDLE ||
+               status == PSA_ERROR_DOES_NOT_EXIST) {
+        /* First boot — generate and persist */
+        LOG_INF("CRYPTO: no key at slot 0x%08X — provisioning",
+                CONFIG_LIMA_CRYPTO_KEY_ID);
+        status = provision_key(&signing_key_id);
+        if (status != PSA_SUCCESS) {
+            LOG_ERR("CRYPTO: provision_key failed (%d)", status);
+            return -EIO;
+        }
+    } else {
+        LOG_ERR("CRYPTO: key attribute query failed (%d)", status);
         return -EIO;
     }
-    
-    // /* 2. Check for existing persistent key */
-    // psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
-    // status = psa_get_key_attributes(CONFIG_LIMA_CRYPTO_KEY_ID, &attr);
-    // psa_reset_key_attributes(&attr);
-
-    // if (status == PSA_ERROR_INVALID_HANDLE ||
-    //     status == PSA_ERROR_DOES_NOT_EXIST) {
-    //     /* No key yet — generate one (dev/first boot) */
-    //     LOG_INF("CRYPTO: no key at slot 0x%08X — provisioning",
-    //             CONFIG_LIMA_CRYPTO_KEY_ID);
-    //     status = provision_key(&signing_key_id);
-    //     if (status != PSA_SUCCESS) {
-    //         return -EIO;
-    //     }
-    // } else if (status != PSA_SUCCESS) {
-    //     LOG_ERR("CRYPTO: key attribute query failed (%d)", status);
-    //     return -EIO;
-    // } else {
-    //     LOG_INF("CRYPTO: existing key found at slot 0x%08X",
-    //             CONFIG_LIMA_CRYPTO_KEY_ID);
-    // }
-
-    // /* 3. Open the key for use */
-    // signing_key_id = CONFIG_LIMA_CRYPTO_KEY_ID;
-
-    // nerfing for v1
-    /* 4. Log public key for gateway registration (dev convenience) */
 
     log_public_key(signing_key_id);
     LOG_INF("CRYPTO: initialized — ECDSA-P256/SHA-256 ready (key_id=0x%08X)",
             signing_key_id);
-
-    // LOG_WRN("CRYPTO: nerfing public key export for v1 — sign only)");
-    // log_public_key(signing_key_id);
-
-    LOG_INF("CRYPTO: initialized — ECDSA-P256/SHA-256 ready");
     return 0;
 }
 

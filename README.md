@@ -15,7 +15,7 @@
 > ---
 > Active development.
 >
-> Current phase: gateway receiver and persistent key storage.
+> Current phase: gateway receiver + MQTT + SQLite audit log.
 
 ---
 
@@ -76,7 +76,7 @@ Gateway receiver + MQTT + SQLite audit log
 
 | Trigger | Use Case | Sensor |
 |---|---|---|
-| `PRESSURE_BREACH` | Cabinet puncture, enclosure door open, seal broken | BMP280 barometric |
+| `PRESSURE_BREACH` | Cabinet puncture, enclosure door open, seal broken | BME280 barometric |
 | `MOTION_DETECTED` | Vehicle tow, rack movement, vibration attack | MPU6050 IMU |
 | `DUAL_BREACH` | Full physical intrusion — moved AND breached | Both |
 
@@ -90,7 +90,7 @@ Each fires independently. An attacker must defeat both sensors simultaneously to
 |---|---|---|
 | Edge Node | Nordic nRF52840 MDK USB Dongle | Sensor + crypto + BLE |
 | IMU | MPU6050 | Motion / vibration detection |
-| Barometric | BMP280 | Pressure delta detection |
+| Barometric | BME280 | Pressure delta detection |
 | Crypto | CryptoCell-310 (on-die) | ECDSA-P256 hardware signing |
 | Gateway | Raspberry Pi Zero | BLE scanner + MQTT broker |
 
@@ -190,6 +190,8 @@ lima-node/
 │   │   ├── FLASHING.md
 │   │   ├── DEV_SETUP.md
 │   │   └── quickref.md
+│   └── dev/                       # Session context + dev notes
+│       └── context.md
 │   ├── logs/                      # Test logs / traces
 │   ├── media/                     # Images used in docs/README
 │   ├── resources/                 # Reference material
@@ -223,7 +225,7 @@ Major technical decisions are documented in [`docs/architecture/adr/`](docs/arch
 | [ADR-003](docs/architecture/adr/ADR-003-mqtt-vs-alternatives.md) | MQTT over CoAP / raw TCP / HTTP | Active |
 | [ADR-004](docs/architecture/adr/ADR-004-zephyr-vs-alternatives.md) | Zephyr RTOS over bare metal / FreeRTOS | Active |
 | [ADR-005](docs/architecture/adr/ADR-005-encrypt-everything.md) | AES-256-GCM + ECDSA-P256 on all payloads | Active |
-| [ADR-006](docs/architecture/adr/ADR-006-persistent-key-storage.md) | Persistent PSA Key Storage | Proposed |
+| [ADR-006](docs/architecture/adr/ADR-006-persistent-key-storage.md) | Persistent PSA Key Storage | Resolved |
 
 ---
 
