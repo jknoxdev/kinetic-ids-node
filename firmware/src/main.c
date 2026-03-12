@@ -38,8 +38,10 @@
 
 LOG_MODULE_REGISTER(lima_main, LOG_LEVEL_INF);
 
-#define I2C0_SCL_PIN 19
-#define I2C0_SDA_PIN 20
+// #define I2C0_SCL_PIN 19
+// #define I2C0_SDA_PIN 20
+#define I2C0_SCL_PIN 04
+#define I2C0_SDA_PIN 05
 
 /* ── Board definitions ───────────────────────────────────────────────────── */
 
