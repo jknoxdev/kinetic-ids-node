@@ -1,20 +1,6 @@
-// &i2c0 {
-//     status = "okay";
-//     pinctrl-0 = <&i2c0_default>;
-//     pinctrl-1 = <&i2c0_sleep>;
-//     pinctrl-names = "default", "sleep";
-//     mpu6050@68 {
-//         compatible = "invensense,mpu6050";
-//         reg = <0x68>;
-//         int-gpios = <&gpio0 3 GPIO_ACTIVE_HIGH>;
-//     };
-//     bme280@77 {
-//         compatible = "bosch,bme280";
-//         reg = <0x76>;
-//     };
-// };
-
 &i2c0 {
+    compatible = "nordic,nrf-twim";
+    /delete-property/ zephyr,pm-device-runtime-auto;
     status = "okay";
     pinctrl-0 = <&i2c0_default>;
     pinctrl-1 = <&i2c0_sleep>;
